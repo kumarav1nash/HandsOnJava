@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import './App.css'
 import EditorPane from './components/EditorPane'
+import ProblemsSection from './components/ProblemsSection'
 import Header from './components/Header'
 import OutputPane from './components/OutputPane'
 import { runJava } from './services/compilerClient'
@@ -16,6 +17,7 @@ function App() {
   const [error, setError] = useState('')
   const [meta, setMeta] = useState(null)
   const [theme, setTheme] = useState('vs-dark')
+  const [mode, setMode] = useState(localStorage.getItem('app_mode') || 'Compiler')
   const [lastSaved, setLastSaved] = useState(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
@@ -135,6 +137,11 @@ function App() {
     toast.success(`Switched to ${next === 'vs' ? 'light' : 'dark'} theme`)
   }, [theme])
 
+  const onModeToggle = useCallback((next) => {
+    setMode(next)
+    localStorage.setItem('app_mode', next)
+  }, [])
+
   const onClearOutput = useCallback(() => {
     setOutput('')
     setError('')
@@ -219,139 +226,150 @@ function App() {
       />
       
       <main className="app__main" role="main">
-        <Split 
-          sizes={[60, 40]} 
-          minSize={300} 
-          gutterSize={8} 
-          className="split"
-          aria-label="Resizable editor and output panels"
-        >
-          {/* Editor Panel */}
-          <section 
-            className="pane pane--editor" 
-            role="region" 
-            aria-label="Code Editor"
-          >
-            <div className="pane__header">
-              <h2 className="pane__title">Code Editor</h2>
-              <div className="toolbar">
-                <div className="toolbar__group">
-                  <button 
-                    ref={runButtonRef}
-                    className={classNames('btn', 'btn--primary', { loading: running })}
-                    onClick={onRun} 
-                    disabled={running || !isOnline}
-                    aria-label={running ? 'Running code' : 'Run code (Ctrl+Enter)'}
-                    title="Run code (Ctrl+Enter)"
-                  >
-                    {running ? (
-                      <>
-                        <span className="btn__spinner" aria-hidden="true">⟳</span>
-                        Running...
-                      </>
-                    ) : (
-                      <>
-                        <span aria-hidden="true">▶</span>
-                        Run
-                      </>
-                    )}
-                  </button>
-                  
-                  <button 
-                    className="btn btn--secondary"
-                    onClick={onClearOutput}
-                    aria-label="Clear output"
-                    title="Clear output"
-                  >
-                    <span aria-hidden="true">🗑</span>
-                    Clear
-                  </button>
-                  
-                  <button 
-                    className="btn btn--secondary"
-                    onClick={onCopyCode}
-                    aria-label="Copy code to clipboard"
-                    title="Copy code"
-                  >
-                    <span aria-hidden="true">📋</span>
-                    Copy
-                  </button>
-                </div>
-                
-                <div className="toolbar__separator" aria-hidden="true" />
-                
-                <div className="toolbar__group">
-                  <select 
-                    className="btn btn--ghost"
-                    onChange={(e) => {
-                      const example = examples[e.target.value]
-                      if (example) onLoadExample(example.code)
-                    }}
-                    aria-label="Load code example"
-                    title="Load example code"
-                  >
-                    <option value="">Examples</option>
-                    {examples.map((example, index) => (
-                      <option key={index} value={index}>
-                        {example.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-            
-            <div className="editor-container">
-              <EditorPane 
-                ref={editorRef}
-                value={code} 
-                onChange={setCode} 
-                language="java" 
-                theme={theme} 
-                height="100%"
-                aria-label="Java code editor"
-              />
-            </div>
-          </section>
+        <div className="toolbar" style={{ marginBottom: 'var(--space-lg)' }}>
+          <div className="toolbar__group" role="tablist" aria-label="App mode">
+            <button className={classNames('btn btn--ghost', { active: mode === 'Compiler' })} role="tab" aria-selected={mode === 'Compiler'} onClick={() => onModeToggle('Compiler')}>Compiler</button>
+            <button className={classNames('btn btn--ghost', { active: mode === 'Problems' })} role="tab" aria-selected={mode === 'Problems'} onClick={() => onModeToggle('Problems')}>Problems</button>
+          </div>
+        </div>
 
-          {/* Input/Output Panel */}
-          <section 
-            className="pane pane--controls" 
-            role="region" 
-            aria-label="Program Input and Output"
+        {mode === 'Compiler' ? (
+          <Split 
+            sizes={[60, 40]} 
+            minSize={300} 
+            gutterSize={8} 
+            className="split"
+            aria-label="Resizable editor and output panels"
           >
-            <div className="pane__header">
-              <h2 className="pane__title">Input & Output</h2>
-            </div>
-            
-            <div className="controls">
-              <label className="label" htmlFor="stdin-input">
-                Program Input (stdin)
-              </label>
-              <textarea
-                id="stdin-input"
-                className="input"
-                rows={6}
-                value={stdin}
-                onChange={(e) => setStdin(e.target.value)}
-                placeholder="Enter input for your program here..."
-                aria-describedby="stdin-help"
-              />
-              <div id="stdin-help" className="sr-only">
-                This input will be passed to your Java program's standard input stream
+            {/* Editor Panel */}
+            <section 
+              className="pane pane--editor" 
+              role="region" 
+              aria-label="Code Editor"
+            >
+              <div className="pane__header">
+                <h2 className="pane__title">Code Editor</h2>
+                <div className="toolbar">
+                  <div className="toolbar__group">
+                    <button 
+                      ref={runButtonRef}
+                      className={classNames('btn', 'btn--primary', { loading: running })}
+                      onClick={onRun} 
+                      disabled={running || !isOnline}
+                      aria-label={running ? 'Running code' : 'Run code (Ctrl+Enter)'}
+                      title="Run code (Ctrl+Enter)"
+                    >
+                      {running ? (
+                        <>
+                          <span className="btn__spinner" aria-hidden="true">⟳</span>
+                          Running...
+                        </>
+                      ) : (
+                        <>
+                          <span aria-hidden="true">▶</span>
+                          Run
+                        </>
+                      )}
+                    </button>
+                    
+                    <button 
+                      className="btn btn--secondary"
+                      onClick={onClearOutput}
+                      aria-label="Clear output"
+                      title="Clear output"
+                    >
+                      <span aria-hidden="true">🗑</span>
+                      Clear
+                    </button>
+                    
+                    <button 
+                      className="btn btn--secondary"
+                      onClick={onCopyCode}
+                      aria-label="Copy code to clipboard"
+                      title="Copy code"
+                    >
+                      <span aria-hidden="true">📋</span>
+                      Copy
+                    </button>
+                  </div>
+                  
+                  <div className="toolbar__separator" aria-hidden="true" />
+                  
+                  <div className="toolbar__group">
+                    <select 
+                      className="btn btn--ghost"
+                      onChange={(e) => {
+                        const example = examples[e.target.value]
+                        if (example) onLoadExample(example.code)
+                      }}
+                      aria-label="Load code example"
+                      title="Load example code"
+                    >
+                      <option value="">Examples</option>
+                      {examples.map((example, index) => (
+                        <option key={index} value={index}>
+                          {example.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <OutputPane 
-              stdout={output}
-              stderr={error}
-              metadata={meta}
-              isRunning={running}
-              hasOutput={Boolean(output?.trim()) || Boolean(error?.trim())}
-              onClear={onClearOutput}
-            />
-          </section>
-        </Split>
+              
+              <div className="editor-container">
+                <EditorPane 
+                  ref={editorRef}
+                  value={code} 
+                  onChange={setCode} 
+                  language="java" 
+                  theme={theme} 
+                  height="100%"
+                  aria-label="Java code editor"
+                />
+              </div>
+            </section>
+
+            {/* Input/Output Panel */}
+            <section 
+              className="pane pane--controls" 
+              role="region" 
+              aria-label="Program Input and Output"
+            >
+              <div className="pane__header">
+                <h2 className="pane__title">Input & Output</h2>
+              </div>
+              
+              <div className="controls">
+                <label className="label" htmlFor="stdin-input">
+                  Program Input (stdin)
+                </label>
+                <textarea
+                  id="stdin-input"
+                  className="input"
+                  rows={6}
+                  value={stdin}
+                  onChange={(e) => setStdin(e.target.value)}
+                  placeholder="Enter input for your program here..."
+                  aria-describedby="stdin-help"
+                />
+                <div id="stdin-help" className="sr-only">
+                  This input will be passed to your Java program's standard input stream
+                </div>
+              </div>
+              
+              <OutputPane 
+                stdout={output}
+                stderr={error}
+                metadata={meta}
+                isRunning={running}
+                hasOutput={Boolean(output?.trim()) || Boolean(error?.trim())}
+                onClear={onClearOutput}
+              />
+            </section>
+          </Split>
+        ) : (
+          <ProblemsSection />
+        )}
       </main>
       
       {/* Status Bar */}
