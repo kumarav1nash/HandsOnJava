@@ -1,66 +1,424 @@
-import { useState } from 'react'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import './App.css'
 import EditorPane from './components/EditorPane'
+import Header from './components/Header'
+import OutputPane from './components/OutputPane'
 import { runJava } from './services/compilerClient'
+import Split from 'react-split'
+import toast, { Toaster } from 'react-hot-toast'
+import classNames from 'classnames'
 
 function App() {
-  const [code, setCode] = useState(`public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}`)
+  const [code, setCode] = useState(`public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}`)
   const [stdin, setStdin] = useState('')
   const [running, setRunning] = useState(false)
   const [output, setOutput] = useState('')
   const [error, setError] = useState('')
+  const [meta, setMeta] = useState(null)
+  const [theme, setTheme] = useState('vs-dark')
+  const [lastSaved, setLastSaved] = useState(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  
+  const editorRef = useRef(null)
+  const runButtonRef = useRef(null)
 
-  const onRun = async () => {
+  // Load saved data on mount
+  useEffect(() => {
+    const savedCode = localStorage.getItem('java_code')
+    const savedStdin = localStorage.getItem('java_stdin')
+    const savedTheme = localStorage.getItem('editor_theme')
+    
+    if (savedCode) {
+      setCode(savedCode)
+      setLastSaved(new Date())
+    }
+    if (savedStdin) setStdin(savedStdin)
+    if (savedTheme) setTheme(savedTheme)
+
+    // Apply theme to document
+    document.documentElement.setAttribute('data-theme', savedTheme === 'vs' ? 'light' : 'dark')
+  }, [])
+
+  // Auto-save code with debouncing
+  useEffect(() => {
+    setHasUnsavedChanges(true)
+    const id = setTimeout(() => {
+      localStorage.setItem('java_code', code)
+      setLastSaved(new Date())
+      setHasUnsavedChanges(false)
+    }, 800)
+    return () => clearTimeout(id)
+  }, [code])
+
+  // Auto-save stdin
+  useEffect(() => {
+    const id = setTimeout(() => {
+      localStorage.setItem('java_stdin', stdin)
+    }, 500)
+    return () => clearTimeout(id)
+  }, [stdin])
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  const onRun = useCallback(async () => {
+    if (!isOnline) {
+      toast.error('No internet connection')
+      return
+    }
+
+    if (!code.trim()) {
+      toast.error('Please enter some code first')
+      return
+    }
+
     setRunning(true)
     setOutput('')
     setError('')
+    setMeta(null)
+    
+    const startTime = Date.now()
+    const loadingToast = toast.loading('Compiling and running...')
+    
     try {
       const result = await runJava(code, stdin)
+      const duration = Date.now() - startTime
+      
       setOutput(result.stdout)
       setError(result.stderr)
+      setMeta({ 
+        exitCode: result.exitCode, 
+        durationMs: result.durationMs || duration,
+        compiledAt: new Date().toLocaleTimeString()
+      })
+      
+      toast.dismiss(loadingToast)
+      
+      if (result.exitCode === 0) {
+        toast.success(`Executed successfully in ${result.durationMs || duration}ms`)
+      } else {
+        toast.error(`Process exited with code ${result.exitCode}`)
+      }
     } catch (e) {
-      setError(e?.message || 'Unexpected error')
+      toast.dismiss(loadingToast)
+      const errorMessage = e?.message || 'Unexpected error occurred'
+      setError(errorMessage)
+      setMeta({ 
+        exitCode: -1, 
+        durationMs: Date.now() - startTime,
+        compiledAt: new Date().toLocaleTimeString(),
+        error: true
+      })
+      toast.error('Compilation failed')
     } finally {
       setRunning(false)
     }
-  }
+  }, [code, stdin, isOnline])
+
+  const onThemeToggle = useCallback(() => {
+    const next = theme === 'vs-dark' ? 'vs' : 'vs-dark'
+    setTheme(next)
+    localStorage.setItem('editor_theme', next)
+    document.documentElement.setAttribute('data-theme', next === 'vs' ? 'light' : 'dark')
+    toast.success(`Switched to ${next === 'vs' ? 'light' : 'dark'} theme`)
+  }, [theme])
+
+  const onClearOutput = useCallback(() => {
+    setOutput('')
+    setError('')
+    setMeta(null)
+    toast('Output cleared')
+  }, [])
+
+  const onCopyCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      toast.success('Code copied to clipboard')
+    } catch (e) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = code
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      toast.success('Code copied to clipboard')
+    }
+  }, [code])
+
+  const onLoadExample = useCallback((exampleCode) => {
+    setCode(exampleCode)
+    toast.success('Example loaded')
+  }, [])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      const isMac = navigator.platform.toUpperCase().includes('MAC')
+      const runShortcut = (isMac && e.metaKey && e.key === 'Enter') || (!isMac && e.ctrlKey && e.key === 'Enter')
+      const saveShortcut = (isMac && e.metaKey && e.key === 's') || (!isMac && e.ctrlKey && e.key === 's')
+      
+      if (runShortcut && !running) {
+        e.preventDefault()
+        onRun()
+      } else if (saveShortcut) {
+        e.preventDefault()
+        localStorage.setItem('java_code', code)
+        setLastSaved(new Date())
+        setHasUnsavedChanges(false)
+        toast.success('Code saved')
+      }
+    }
+    
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onRun, running, code])
+
+  // Focus management
+  const focusEditor = useCallback(() => {
+    if (editorRef.current) {
+      editorRef.current.focus()
+    }
+  }, [])
+
+  const examples = useMemo(() => [
+    {
+      name: 'Hello World',
+      code: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}`
+    },
+    {
+      name: 'Input/Output',
+      code: `import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        System.out.print("Enter your name: ");\n        String name = scanner.nextLine();\n        System.out.println("Hello, " + name + "!");\n        scanner.close();\n    }\n}`
+    },
+    {
+      name: 'Loop Example',
+      code: `public class Main {\n    public static void main(String[] args) {\n        for (int i = 1; i <= 10; i++) {\n            System.out.println("Number: " + i);\n        }\n    }\n}`
+    }
+  ], [])
 
   return (
-    <div className="app">
-      <header className="app__header">
-        <img src="/vite.svg" className="logo" alt="Vite logo" />
-        <h1>Java Online Compiler</h1>
-      </header>
-      <main className="app__main">
-        <section className="pane pane--editor">
-          <EditorPane value={code} onChange={setCode} language="java" />
-        </section>
-        <section className="pane pane--controls">
-          <div className="controls">
-            <label className="label">Program Input (stdin)</label>
-            <textarea
-              className="input"
-              rows={6}
-              value={stdin}
-              onChange={(e) => setStdin(e.target.value)}
-              placeholder="Type input for program here"
+    <div className="app" role="application" aria-label="Java Online Compiler">
+      <Header 
+        onThemeToggle={onThemeToggle} 
+        theme={theme}
+        hasUnsavedChanges={hasUnsavedChanges}
+        lastSaved={lastSaved}
+        isOnline={isOnline}
+      />
+      
+      <main className="app__main" role="main">
+        <Split 
+          sizes={[60, 40]} 
+          minSize={300} 
+          gutterSize={8} 
+          className="split"
+          aria-label="Resizable editor and output panels"
+        >
+          {/* Editor Panel */}
+          <section 
+            className="pane pane--editor" 
+            role="region" 
+            aria-label="Code Editor"
+          >
+            <div className="pane__header">
+              <h2 className="pane__title">Code Editor</h2>
+              <div className="toolbar">
+                <div className="toolbar__group">
+                  <button 
+                    ref={runButtonRef}
+                    className={classNames('btn', 'btn--primary', { loading: running })}
+                    onClick={onRun} 
+                    disabled={running || !isOnline}
+                    aria-label={running ? 'Running code' : 'Run code (Ctrl+Enter)'}
+                    title="Run code (Ctrl+Enter)"
+                  >
+                    {running ? (
+                      <>
+                        <span className="btn__spinner" aria-hidden="true">⟳</span>
+                        Running...
+                      </>
+                    ) : (
+                      <>
+                        <span aria-hidden="true">▶</span>
+                        Run
+                      </>
+                    )}
+                  </button>
+                  
+                  <button 
+                    className="btn btn--secondary"
+                    onClick={onClearOutput}
+                    aria-label="Clear output"
+                    title="Clear output"
+                  >
+                    <span aria-hidden="true">🗑</span>
+                    Clear
+                  </button>
+                  
+                  <button 
+                    className="btn btn--secondary"
+                    onClick={onCopyCode}
+                    aria-label="Copy code to clipboard"
+                    title="Copy code"
+                  >
+                    <span aria-hidden="true">📋</span>
+                    Copy
+                  </button>
+                </div>
+                
+                <div className="toolbar__separator" aria-hidden="true" />
+                
+                <div className="toolbar__group">
+                  <select 
+                    className="btn btn--ghost"
+                    onChange={(e) => {
+                      const example = examples[e.target.value]
+                      if (example) onLoadExample(example.code)
+                    }}
+                    aria-label="Load code example"
+                    title="Load example code"
+                  >
+                    <option value="">Examples</option>
+                    {examples.map((example, index) => (
+                      <option key={index} value={index}>
+                        {example.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div className="editor-container">
+              <EditorPane 
+                ref={editorRef}
+                value={code} 
+                onChange={setCode} 
+                language="java" 
+                theme={theme} 
+                height="100%"
+                aria-label="Java code editor"
+              />
+            </div>
+          </section>
+
+          {/* Input/Output Panel */}
+          <section 
+            className="pane pane--controls" 
+            role="region" 
+            aria-label="Program Input and Output"
+          >
+            <div className="pane__header">
+              <h2 className="pane__title">Input & Output</h2>
+            </div>
+            
+            <div className="controls">
+              <label className="label" htmlFor="stdin-input">
+                Program Input (stdin)
+              </label>
+              <textarea
+                id="stdin-input"
+                className="input"
+                rows={6}
+                value={stdin}
+                onChange={(e) => setStdin(e.target.value)}
+                placeholder="Enter input for your program here..."
+                aria-describedby="stdin-help"
+              />
+              <div id="stdin-help" className="sr-only">
+                This input will be passed to your Java program's standard input stream
+              </div>
+            </div>
+            
+            <OutputPane 
+              stdout={output}
+              stderr={error}
+              metadata={meta}
+              isRunning={running}
+              hasOutput={Boolean(output?.trim()) || Boolean(error?.trim())}
+              onClear={onClearOutput}
             />
-            <button className="btn" onClick={onRun} disabled={running}>
-              {running ? 'Running…' : 'Run'}
-            </button>
-          </div>
-          <div className="outputs">
-            <div className="output">
-              <div className="output__title">Stdout</div>
-              <pre className="output__content">{output || ' '}</pre>
-            </div>
-            <div className="output">
-              <div className="output__title">Stderr</div>
-              <pre className="output__content error">{error || ' '}</pre>
-            </div>
-          </div>
-        </section>
+          </section>
+        </Split>
       </main>
+      
+      {/* Status Bar */}
+      <footer className="app__status" role="contentinfo" aria-label="Application status">
+        <div className="status__item">
+          <span className="status__label">Status:</span>
+          <span className={classNames('status__value', {
+            'status__value--online': isOnline,
+            'status__value--offline': !isOnline
+          })}>
+            {isOnline ? 'Online' : 'Offline'}
+          </span>
+        </div>
+        
+        {lastSaved && (
+          <div className="status__item">
+            <span className="status__label">Last saved:</span>
+            <span className="status__value">
+              {lastSaved.toLocaleTimeString()}
+            </span>
+          </div>
+        )}
+        
+        {hasUnsavedChanges && (
+          <div className="status__item">
+            <span className="status__indicator status__indicator--unsaved" aria-label="Unsaved changes">
+              ●
+            </span>
+            <span className="status__value">Unsaved changes</span>
+          </div>
+        )}
+      </footer>
+      
+      <Toaster 
+        position="bottom-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: 'var(--color-surface)',
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-border)',
+          },
+          success: {
+            iconTheme: {
+              primary: 'var(--color-success)',
+              secondary: 'var(--color-surface)',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: 'var(--color-error)',
+              secondary: 'var(--color-surface)',
+            },
+          },
+        }}
+      />
+      
+      {/* Screen reader announcements */}
+      <div 
+        className="sr-only" 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+      >
+        {running && 'Code is running...'}
+        {!isOnline && 'Application is offline'}
+      </div>
     </div>
   )
 }
