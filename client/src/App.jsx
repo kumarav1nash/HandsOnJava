@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import './App.css'
 import EditorPane from './components/EditorPane'
+import ContextMenu from './design-system/components/ContextMenu'
 import ProblemsSection from './components/ProblemsSection'
 import Header from './components/Header'
 import OutputPane from './components/OutputPane'
 import { runJava } from './services/compilerClient'
-import Split from 'react-split'
+import SplitPane from './design-system/components/SplitPane'
 import toast, { Toaster } from 'react-hot-toast'
 import classNames from 'classnames'
 
@@ -216,7 +217,7 @@ function App() {
   ], [])
 
   return (
-    <div className="app" role="application" aria-label="Java Online Compiler">
+    <div className="app" role="application" aria-label="Hands On Java">
       <Header 
         onThemeToggle={onThemeToggle} 
         theme={theme}
@@ -234,12 +235,12 @@ function App() {
         </div>
 
         {mode === 'Compiler' ? (
-          <Split 
+          <SplitPane 
+            direction="horizontal"
             sizes={[60, 40]} 
             minSize={300} 
             gutterSize={8} 
-            className="split"
-            aria-label="Resizable editor and output panels"
+            ariaLabel="Resizable editor and output panels"
           >
             {/* Editor Panel */}
             <section 
@@ -317,15 +318,23 @@ function App() {
               </div>
               
               <div className="editor-container">
-                <EditorPane 
-                  ref={editorRef}
-                  value={code} 
-                  onChange={setCode} 
-                  language="java" 
-                  theme={theme} 
-                  height="100%"
-                  aria-label="Java code editor"
-                />
+                <ContextMenu
+                  items={[
+                    { id: 'run', label: 'Run', shortcut: 'Cmd/Ctrl+Enter', onSelect: onRun, disabled: running || !isOnline },
+                    { id: 'copy', label: 'Copy Code', shortcut: 'Cmd/Ctrl+C', onSelect: onCopyCode },
+                    { id: 'clear', label: 'Clear Output', onSelect: onClearOutput }
+                  ]}
+                >
+                  <EditorPane 
+                    ref={editorRef}
+                    value={code} 
+                    onChange={setCode} 
+                    language="java" 
+                    theme={theme} 
+                    height="100%"
+                    aria-label="Java code editor"
+                  />
+                </ContextMenu>
               </div>
             </section>
 
@@ -366,14 +375,14 @@ function App() {
                 onClear={onClearOutput}
               />
             </section>
-          </Split>
+          </SplitPane>
         ) : (
           <ProblemsSection />
         )}
       </main>
       
       {/* Status Bar */}
-      <footer className="app__status" role="contentinfo" aria-label="Application status">
+      {/* <footer className="app__status" role="contentinfo" aria-label="Application status">
         <div className="status__item">
           <span className="status__label">Status:</span>
           <span className={classNames('status__value', {
@@ -401,7 +410,7 @@ function App() {
             <span className="status__value">Unsaved changes</span>
           </div>
         )}
-      </footer>
+      </footer> */}
       
       <Toaster 
         position="bottom-right"

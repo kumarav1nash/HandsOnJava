@@ -29,11 +29,11 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline }
         <img 
           src="/vite.svg" 
           className="logo" 
-          alt="Java Online Compiler" 
+          alt="Hands On Java" 
           role="img"
         />
         <h1 className="header__title">
-          Java Online Compiler
+          Hands On Java
         </h1>
       </div>
       

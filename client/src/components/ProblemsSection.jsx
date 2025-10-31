@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState, useCallback } from 'react'
 import { listProblems, getProblem } from '../services/problemsClient'
 import { runSolution, submitSolution } from '../services/solutionsClient'
 import EditorPane from './EditorPane'
+import ContextMenu from '../design-system/components/ContextMenu'
+import SplitPane from '../design-system/components/SplitPane'
+import ProblemsHeader from './ProblemsHeader'
+import ProblemTabs from './ProblemTabs'
+import ResultsPanel from './ResultsPanel'
 import classNames from 'classnames'
 import toast from 'react-hot-toast'
 
@@ -12,6 +17,7 @@ const ProblemsSection = () => {
   const [codeByProblem, setCodeByProblem] = useState({})
   const [running, setRunning] = useState(false)
   const [results, setResults] = useState(null)
+  const [activeTab, setActiveTab] = useState('Description')
   const [theme, setTheme] = useState(localStorage.getItem('editor_theme') || 'vs-dark')
 
   useEffect(() => {
@@ -88,75 +94,86 @@ const ProblemsSection = () => {
 
   return (
     <div className="problems-section" role="region" aria-label="Problems">
-      <div className="problems-layout">
-        <aside className="problems-list" aria-label="Problem list">
-          <h3 className="pane__title">Problems</h3>
-          <ul className="list">
-            {Array.isArray(problems) && problems.map((p) => (
-              <li key={p.id}>
-                <button
-                  className={classNames('btn btn--ghost', { active: selectedId === p.id })}
-                  onClick={() => setSelectedId(p.id)}
-                  aria-pressed={selectedId === p.id}
-                >
-                  {p.title}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </aside>
-
+      <div className="problems-layout problems-layout--single">
         <section className="problem-detail" role="region" aria-label="Problem detail and editor">
           {selected ? (
-            <div className="pane">
-              <div className="pane__header">
-                <h2 className="pane__title">{selected.title}</h2>
-                <div className="toolbar">
-                  <button className={classNames('btn', 'btn--primary', { loading: running })} onClick={onRun} disabled={running}>
-                    {running ? 'Running…' : 'Run'}
-                  </button>
-                  <button className="btn btn--success" onClick={onSubmit}>Submit</button>
-                </div>
-              </div>
+            <div className="pane pane--full">
+              <ProblemsHeader 
+                title={selected.title} 
+                onRun={onRun} 
+                onSubmit={onSubmit} 
+                running={running} 
+                problems={problems}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
 
-              <div className="problem-content">
-                <div className="problem-spec">
-                  <h4>Statement</h4>
-                  <p>{selected.statement}</p>
-                  <h4>Input</h4>
-                  <p>{selected.inputSpec}</p>
-                  <h4>Output</h4>
-                  <p>{selected.outputSpec}</p>
-                  <h4>Constraints</h4>
-                  <p>{selected.constraints}</p>
-                  <h4>Sample Test Cases</h4>
-                  <ul>
-                    {selected.samples.map((s, i) => (
-                      <li key={i}><code>Input:</code> {s.input.replace(/\n/g, '↵ ')}; <code>Output:</code> {s.expectedOutput.replace(/\n/g, '↵ ')}</li>
-                    ))}
-                  </ul>
-                </div>
+              <ProblemTabs active={activeTab} onChange={setActiveTab} />
 
-                <div className="editor-container" style={{ minHeight: 300 }}>
-                  <EditorPane value={code} onChange={updateCode} language="java" theme={theme} height="300px" />
-                </div>
-              </div>
-
-              {results && (
-                <div className="test-results">
-                  <h4>Results</h4>
-                  <div className="outputs">
-                    {results.results.map((r, i) => (
-                      <div key={i} className="output">
-                        <div className="output__title">Test #{i + 1} — {r.passed ? 'Pass' : 'Fail'}</div>
-                        <pre className={classNames('output__content', { success: r.passed, error: !r.passed })}>
-{`Input:\n${r.input}\nExpected:\n${r.expectedOutput}\nActual:\n${r.actualOutput}\nExit: ${r.exitCode} • ${r.durationMs} ms`}
-                        </pre>
-                      </div>
-                    ))}
+              {/* Outer horizontal split: left spec, right editor/results */}
+              <SplitPane 
+                direction="horizontal" 
+                sizes={[35, 65]} 
+                minSize={[280, 380]} 
+                gutterSize={8} 
+                ariaLabel="Resizable problem description and editor panels"
+              >
+                {/* Left: Problem specification */}
+                <div className="pane pane--problem-spec" role="tabpanel" aria-labelledby="Description">
+                  <div className="card">
+                    <h4>Statement</h4>
+                    <p>{selected.statement}</p>
+                  </div>
+                  <div className="card">
+                    <h4>Input</h4>
+                    <p>{selected.inputSpec}</p>
+                  </div>
+                  <div className="card">
+                    <h4>Output</h4>
+                    <p>{selected.outputSpec}</p>
+                  </div>
+                  <div className="card">
+                    <h4>Constraints</h4>
+                    <p>{selected.constraints}</p>
+                  </div>
+                  <div className="card">
+                    <h4>Sample Test Cases</h4>
+                    <ul className="samples">
+                      {selected.samples.map((s, i) => (
+                        <li key={i}><code>Input:</code> {s.input.replace(/\n/g, '↵ ')}; <code>Output:</code> {s.expectedOutput.replace(/\n/g, '↵ ')}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-              )}
+
+                {/* Right: nested vertical split for editor and results */}
+                <div className="pane pane--editor-group">
+                  <SplitPane 
+                    direction="vertical" 
+                    sizes={[65, 35]} 
+                    minSize={[240, 200]} 
+                    gutterSize={8}
+                    ariaLabel="Resizable editor and test results panels"
+                  >
+                    {/* Editor top */}
+                    <div className="editor-container">
+                      <ContextMenu
+                        items={[
+                          { id: 'run', label: 'Run Sample Tests', shortcut: 'Cmd/Ctrl+Enter', onSelect: onRun, disabled: running },
+                          { id: 'submit', label: 'Submit', onSelect: onSubmit },
+                          { id: 'copy', label: 'Copy Code', shortcut: 'Cmd/Ctrl+C', onSelect: () => navigator.clipboard.writeText(code) }
+                        ]}
+                      >
+                        <EditorPane value={code} onChange={updateCode} language="java" theme={theme} height="100%" />
+                      </ContextMenu>
+                    </div>
+                    {/* Results bottom */}
+                    <div className="results-container">
+                      <ResultsPanel response={results} />
+                    </div>
+                  </SplitPane>
+                </div>
+              </SplitPane>
             </div>
           ) : (
             <div className="pane"><p>Select a problem to view details.</p></div>
