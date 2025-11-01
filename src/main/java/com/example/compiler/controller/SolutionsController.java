@@ -1,7 +1,7 @@
 package com.example.compiler.controller;
 
 import com.example.compiler.model.*;
-import com.example.compiler.repo.InMemoryProblemRepo;
+import com.example.compiler.repo.ProblemRepository;
 import com.example.compiler.service.JavaRunnerService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -13,14 +13,19 @@ import java.util.List;
 @RequestMapping(path = "/api/solutions", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SolutionsController {
     private final JavaRunnerService runner = new JavaRunnerService();
+    private final ProblemRepository repo;
+
+    public SolutionsController(ProblemRepository repo) {
+        this.repo = repo;
+    }
 
     @PostMapping(path = "/run", consumes = MediaType.APPLICATION_JSON_VALUE)
     public SolutionRunResponse run(@RequestBody SolutionRunRequest req) throws Exception {
-        Problem p = InMemoryProblemRepo.get(req.getProblemId());
-        if (p == null) throw new IllegalArgumentException("Problem not found: " + req.getProblemId());
+        Problem p = repo.findById(req.getProblemId()).orElseThrow(() -> new IllegalArgumentException("Problem not found: " + req.getProblemId()));
+        List<TestCase> samples = repo.findTestCasesByProblemId(p.getId());
 
         List<TestCaseResult> results = new ArrayList<>();
-        for (TestCase tc : p.getSamples()) {
+        for (TestCase tc : samples) {
             JavaRunnerService.Result r = runner.compileAndRun(req.getCode(), tc.getInput());
             boolean passed = normalize(r.stdout).equals(normalize(tc.getExpectedOutput())) && r.exitCode == 0;
             // Memory usage is not tracked for the external process; set null
