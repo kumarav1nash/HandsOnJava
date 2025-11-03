@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.example.compiler.util.TextUtils;
 
 @RestController
 @RequestMapping(path = "/api/solutions", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -27,7 +28,7 @@ public class SolutionsController {
         List<TestCaseResult> results = new ArrayList<>();
         for (TestCase tc : samples) {
             JavaRunnerService.Result r = runner.compileAndRun(req.getCode(), tc.getInput());
-            boolean passed = normalize(r.stdout).equals(normalize(tc.getExpectedOutput())) && r.exitCode == 0;
+            boolean passed = TextUtils.normalizeOutput(r.stdout).equals(TextUtils.normalizeOutput(tc.getExpectedOutput())) && r.exitCode == 0;
             // Memory usage is not tracked for the external process; set null
             results.add(new TestCaseResult(tc.getInput(), tc.getExpectedOutput(), r.stdout, r.stderr, r.exitCode, r.durationMs, passed, null));
         }
@@ -44,8 +45,5 @@ public class SolutionsController {
         return new SolutionSubmitResponse(run.getProblemId(), accepted, run.getResults(), message);
     }
 
-    private String normalize(String s) {
-        if (s == null) return "";
-        return s.trim().replaceAll("\\r\\n", "\n");
-    }
+    // Normalization moved to TextUtils.normalizeOutput
 }

@@ -7,6 +7,7 @@ import com.example.compiler.jpa.entity.ProblemEntity;
 import com.example.compiler.jpa.entity.TestCaseEntity;
 import com.example.compiler.jpa.repo.ProblemEntityRepository;
 import com.example.compiler.jpa.repo.TestCaseEntityRepository;
+import com.example.compiler.util.TextUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,7 +28,10 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
     }
 
     private static TestCase toModel(TestCaseEntity e) {
-        return new TestCase(e.getInput(), e.getExpectedOutput());
+        // Decode stored escape sequences (e.g., "\\n") into actual newlines for runtime and comparison
+        String input = TextUtils.unescape(e.getInput());
+        String expected = TextUtils.unescape(e.getExpectedOutput());
+        return new TestCase(input, expected);
     }
 
     @Override
@@ -70,6 +74,7 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
         ProblemEntity p = problems.findById(problemId).orElseThrow(() -> new IllegalArgumentException("Problem not found: " + problemId));
         TestCaseEntity t = new TestCaseEntity();
         t.setProblem(p);
+        // Store as-is; callers may choose to provide real newlines or escaped sequences
         t.setInput(testCase.getInput());
         t.setExpectedOutput(testCase.getExpectedOutput());
         t.setSample(true);
