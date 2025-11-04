@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+.env
+*.env
+client/.env
+client/*.env

@@ -20,5 +20,6 @@
   "theme.light": "Light",
   "theme.dark": "Dark",
   "app.mode.compiler": "Compiler",
-  "app.mode.problems": "Problems"
+  "app.mode.problems": "Problems",
+  "app.mode.admin": "Admin"
 }

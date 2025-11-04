@@ -4,6 +4,7 @@ import { useI18n } from './i18n/useI18n.js'
 import EditorPane from './components/EditorPane'
 import ContextMenu from './design-system/components/ContextMenu'
 import ProblemsSection from './components/ProblemsSection'
+import AdminPanel from './components/AdminPanel'
 import Header from './components/Header'
 import OutputPane from './components/OutputPane'
 import { runJava } from './services/compilerClient'
@@ -233,10 +234,13 @@ function App() {
           <div className="toolbar__group" role="tablist" aria-label="App mode">
             <button className={classNames('btn btn--ghost', { active: mode === 'Compiler' })} role="tab" aria-selected={mode === 'Compiler'} onClick={() => onModeToggle('Compiler')}>{t('app.mode.compiler')}</button>
             <button className={classNames('btn btn--ghost', { active: mode === 'Problems' })} role="tab" aria-selected={mode === 'Problems'} onClick={() => onModeToggle('Problems')}>{t('app.mode.problems')}</button>
+            <button className={classNames('btn btn--ghost', { active: mode === 'Admin' })} role="tab" aria-selected={mode === 'Admin'} onClick={() => onModeToggle('Admin')}>{t('app.mode.admin')}</button>
           </div>
         </div>
 
-        {mode === 'Compiler' ? (
+        {mode === 'Admin' ? (
+          <AdminPanel />
+        ) : mode === 'Compiler' ? (
           <SplitPane 
             direction="horizontal"
             sizes={[60, 40]} 
