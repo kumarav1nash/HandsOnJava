@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import './App.css'
+import { useI18n } from './i18n/useI18n.js'
 import EditorPane from './components/EditorPane'
 import ContextMenu from './design-system/components/ContextMenu'
 import ProblemsSection from './components/ProblemsSection'
@@ -216,8 +217,9 @@ function App() {
     }
   ], [])
 
+  const { t } = useI18n()
   return (
-    <div className="app" role="application" aria-label="Hands On Java">
+    <div className="app" role="application" aria-label={t('header.title')}>
       <Header 
         onThemeToggle={onThemeToggle} 
         theme={theme}
@@ -229,8 +231,8 @@ function App() {
       <main className="app__main" role="main">
         <div className="toolbar" style={{ marginBottom: 'var(--space-lg)' }}>
           <div className="toolbar__group" role="tablist" aria-label="App mode">
-            <button className={classNames('btn btn--ghost', { active: mode === 'Compiler' })} role="tab" aria-selected={mode === 'Compiler'} onClick={() => onModeToggle('Compiler')}>Compiler</button>
-            <button className={classNames('btn btn--ghost', { active: mode === 'Problems' })} role="tab" aria-selected={mode === 'Problems'} onClick={() => onModeToggle('Problems')}>Problems</button>
+            <button className={classNames('btn btn--ghost', { active: mode === 'Compiler' })} role="tab" aria-selected={mode === 'Compiler'} onClick={() => onModeToggle('Compiler')}>{t('app.mode.compiler')}</button>
+            <button className={classNames('btn btn--ghost', { active: mode === 'Problems' })} role="tab" aria-selected={mode === 'Problems'} onClick={() => onModeToggle('Problems')}>{t('app.mode.problems')}</button>
           </div>
         </div>
 

@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
+import LocaleSwitcher from './LocaleSwitcher'
+import { useI18n } from '../i18n/useI18n.js'
 import classNames from 'classnames'
 
 const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline }) => {
   const [saved, setSaved] = useState(false)
+  const { t } = useI18n()
 
   useEffect(() => {
     if (!hasUnsavedChanges && lastSaved) {
@@ -29,11 +32,11 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline }
         <img 
           src="/vite.svg" 
           className="logo" 
-          alt="Hands On Java" 
+          alt={t('header.brand_alt')} 
           role="img"
         />
         <h1 className="header__title">
-          Hands On Java
+          {t('header.title')}
         </h1>
       </div>
       
@@ -46,12 +49,12 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline }
             'status-indicator--online': isOnline,
             'status-indicator--offline': !isOnline
           })}
-          title={isOnline ? 'Connected' : 'Offline'}
-          aria-label={isOnline ? 'Connected to server' : 'Offline - no connection'}
+          title={isOnline ? t('status.connected_title') : t('status.offline_title')}
+          aria-label={isOnline ? t('status.connected_aria') : t('status.offline_aria')}
         >
           <span className="status-indicator__dot" aria-hidden="true" />
           <span className="status-indicator__text">
-            {isOnline ? 'Online' : 'Offline'}
+            {isOnline ? t('status.online') : t('status.offline')}
           </span>
         </div>
         
@@ -65,16 +68,16 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline }
                 aria-label="You have unsaved changes"
               >
                 <span className="save-status__dot" aria-hidden="true">●</span>
-                <span className="save-status__text">Unsaved</span>
+                <span className="save-status__text">{t('save.unsaved')}</span>
               </span>
             ) : saved ? (
               <span 
                 className={classNames('save-status__indicator', 'save-status__indicator--saved', { visible: saved })}
-                title="Changes saved"
-                aria-label="Changes have been saved"
+                title={t('save.saved')}
+                aria-label={t('save.saved')}
               >
                 <span className="save-status__icon" aria-hidden="true">✓</span>
-                <span className="save-status__text">Saved</span>
+                <span className="save-status__text">{t('save.saved')}</span>
               </span>
             ) : lastSaved ? (
               <span 
@@ -95,16 +98,17 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline }
         <button 
           className={classNames('btn', 'btn--secondary', 'theme-toggle')}
           onClick={onThemeToggle}
-          aria-label={`Switch to ${theme === 'vs-dark' ? 'light' : 'dark'} theme`}
-          title={`Switch to ${theme === 'vs-dark' ? 'light' : 'dark'} theme`}
+          aria-label={`Switch to ${theme === 'vs-dark' ? t('theme.light') : t('theme.dark')} theme`}
+          title={`Switch to ${theme === 'vs-dark' ? t('theme.light') : t('theme.dark')} theme`}
         >
           <span className="theme-toggle__icon" aria-hidden="true">
             {theme === 'vs-dark' ? '☀️' : '🌙'}
           </span>
           <span className="theme-toggle__text">
-            {theme === 'vs-dark' ? 'Light' : 'Dark'}
+            {theme === 'vs-dark' ? t('theme.light') : t('theme.dark')}
           </span>
         </button>
+        <LocaleSwitcher />
       </div>
     </header>
   )
