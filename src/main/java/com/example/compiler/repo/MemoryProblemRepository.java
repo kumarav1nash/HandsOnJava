@@ -25,12 +25,19 @@ public class MemoryProblemRepository implements ProblemRepository {
     @Override
     public List<TestCase> findTestCasesByProblemId(String problemId) {
         Problem p = com.example.compiler.repo.InMemoryProblemRepo.get(problemId);
-        return p == null ? new ArrayList<>() : p.getSamples();
+        if (p == null) return new ArrayList<>();
+        List<TestCase> out = new ArrayList<>();
+        if (p.getSamples() != null) {
+            for (TestCase t : p.getSamples()) {
+                out.add(new TestCase(t.getInput(), t.getExpectedOutput(), true));
+            }
+        }
+        return out;
     }
 
     @Override
     public List<TestCase> findAllTestCasesByProblemId(String problemId) {
-        // Memory repo has only samples; treat them as the complete set
+        // Memory repo has only samples; treat them as the complete set, mark as sample
         return findTestCasesByProblemId(problemId);
     }
 
