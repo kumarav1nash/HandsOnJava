@@ -88,6 +88,18 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
 
     @Override
     @Transactional
+    public void saveTestCase(String problemId, TestCase testCase, boolean isSample) {
+        ProblemEntity p = problems.findById(problemId).orElseThrow(() -> new IllegalArgumentException("Problem not found: " + problemId));
+        TestCaseEntity t = new TestCaseEntity();
+        t.setProblem(p);
+        t.setInput(testCase.getInput());
+        t.setExpectedOutput(testCase.getExpectedOutput());
+        t.setSample(isSample);
+        testCases.save(t);
+    }
+
+    @Override
+    @Transactional
     public void deleteTestCasesByProblemId(String problemId) {
         testCases.deleteByProblem_Id(problemId);
     }

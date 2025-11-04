@@ -50,6 +50,11 @@ public class MemoryProblemRepository implements ProblemRepository {
     }
 
     @Override
+    public void saveTestCase(String problemId, TestCase testCase, boolean isSample) {
+        throw new UnsupportedOperationException("Memory repository is read-only for test cases");
+    }
+
+    @Override
     public void deleteTestCasesByProblemId(String problemId) {
         throw new UnsupportedOperationException("Memory repository is read-only for test cases");
     }

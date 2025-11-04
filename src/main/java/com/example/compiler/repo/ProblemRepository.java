@@ -17,5 +17,7 @@ public interface ProblemRepository {
     void saveProblem(Problem problem);
     void deleteProblem(String id);
     void saveTestCase(String problemId, TestCase testCase);
+    // Save a testcase and specify whether it's a sample (visible) or hidden
+    void saveTestCase(String problemId, TestCase testCase, boolean isSample);
     void deleteTestCasesByProblemId(String problemId);
 }
