@@ -6,6 +6,9 @@ This document explains how to export and import problems with their sample and h
 
 - `GET /api/problems/{id}/export` — returns a `ProblemPack` JSON containing metadata, `samples`, and `hidden` tests.
 - `POST /api/problems/import` — accepts a `ProblemPack` JSON and creates/updates the problem and its tests.
+- `GET /api/problems/{id}/export.csv` — returns CSV rows for a single problem and all its tests.
+- `GET /api/problems/export.csv` — returns CSV rows for all problems and their tests.
+- `POST /api/problems/import/csv` — accepts CSV content and imports problems/tests.
 
 ## JSON Schema (informal)
 
@@ -50,3 +53,21 @@ TestCase {
 ## Round-Trip Guarantee
 
 - Export then import of the same `ProblemPack` preserves all fields and test cases.
+## CSV Format
+
+Header:
+
+```
+id,title,statement,inputSpec,outputSpec,constraints,isSample,input,expectedOutput
+```
+
+Notes:
+- Each row represents one test case. Problem metadata is repeated across rows for the same `id`.
+- `isSample` is `true` for visible/sample tests and `false` for hidden tests.
+- Newlines in `input` and `expectedOutput` are escaped as `\n`; quotes are doubled per CSV rules.
+
+Example row:
+
+```
+two-sum,Two Sum,"Given an array...",n,indices,"1 <= n <= 1e5",true,"3\n1 2 3\n3","0 1"
+```

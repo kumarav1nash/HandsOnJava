@@ -44,4 +44,19 @@ public class ProblemsController {
     public void importPack(@RequestBody ProblemPack pack) {
         importExportService.importPack(pack);
     }
+
+    @GetMapping(path = "/{id}/export.csv", produces = "text/csv")
+    public String exportCsvSingle(@PathVariable String id) {
+        return importExportService.exportCsv(id);
+    }
+
+    @GetMapping(path = "/export.csv", produces = "text/csv")
+    public String exportCsvAll() {
+        return importExportService.exportCsvAll();
+    }
+
+    @PostMapping(path = "/import/csv", consumes = {"text/plain", "text/csv"})
+    public void importCsv(@RequestBody String csv) {
+        importExportService.importCsv(csv);
+    }
 }
