@@ -40,6 +40,9 @@ management:
 storage:
   type: ${STORAGE_TYPE:memory}
 
+admin:
+  token: ${ADMIN_TOKEN:}
+
 # Output comparison configuration
 compare:
   mode:
