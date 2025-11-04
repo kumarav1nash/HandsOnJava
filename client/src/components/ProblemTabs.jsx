@@ -8,7 +8,6 @@ const ProblemTabs = ({ active, onChange }) => {
     <div className="tabs" role="tablist" aria-label="Problem sections">
       {TAB_KEYS.map((k) => {
         const selected = active === k
-        const disabled = k !== 'Description'
         const controlId = `${id}-${k}-panel`
         return (
           <button
@@ -17,9 +16,8 @@ const ProblemTabs = ({ active, onChange }) => {
             className={`tab ${selected ? 'active' : ''}`}
             aria-selected={selected}
             aria-controls={controlId}
-            disabled={disabled}
             onClick={() => onChange?.(k)}
-            title={disabled ? 'Coming soon' : k}
+            title={k}
           >
             {k}
           </button>

@@ -59,4 +59,5 @@ export WITH_DOCKER=true
 
 echo "[start] Launching backend (Spring Boot) with database connection ${DB_URL}..."
 cd "${PROJECT_ROOT}"
+export ADMIN_TOKEN=admin_token 
 ./gradlew bootRun

@@ -219,6 +219,7 @@ function App() {
   ], [])
 
   const { t } = useI18n()
+  const [problemNav, setProblemNav] = useState(null)
   return (
     <div className="app" role="application" aria-label={t('header.title')}>
       <Header 
@@ -227,16 +228,13 @@ function App() {
         hasUnsavedChanges={hasUnsavedChanges}
         lastSaved={lastSaved}
         isOnline={isOnline}
+        mode={mode}
+        onModeToggle={onModeToggle}
+        problemNav={problemNav}
       />
       
       <main className="app__main" role="main">
-        <div className="toolbar" style={{ marginBottom: 'var(--space-lg)' }}>
-          <div className="toolbar__group" role="tablist" aria-label="App mode">
-            <button className={classNames('btn btn--ghost', { active: mode === 'Compiler' })} role="tab" aria-selected={mode === 'Compiler'} onClick={() => onModeToggle('Compiler')}>{t('app.mode.compiler')}</button>
-            <button className={classNames('btn btn--ghost', { active: mode === 'Problems' })} role="tab" aria-selected={mode === 'Problems'} onClick={() => onModeToggle('Problems')}>{t('app.mode.problems')}</button>
-            <button className={classNames('btn btn--ghost', { active: mode === 'Admin' })} role="tab" aria-selected={mode === 'Admin'} onClick={() => onModeToggle('Admin')}>{t('app.mode.admin')}</button>
-          </div>
-        </div>
+        {/* Mode navigation moved to Header */}
 
         {mode === 'Admin' ? (
           <AdminPanel />
@@ -383,7 +381,7 @@ function App() {
             </section>
           </SplitPane>
         ) : (
-          <ProblemsSection />
+          <ProblemsSection onProblemNavChange={setProblemNav} />
         )}
       </main>
       
