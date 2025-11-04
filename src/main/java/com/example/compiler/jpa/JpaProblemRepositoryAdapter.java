@@ -31,7 +31,7 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
         // Decode stored escape sequences (e.g., "\\n") into actual newlines for runtime and comparison
         String input = TextUtils.unescape(e.getInput());
         String expected = TextUtils.unescape(e.getExpectedOutput());
-        return new TestCase(input, expected);
+        return new TestCase(input, expected, e.isSample());
     }
 
     @Override
