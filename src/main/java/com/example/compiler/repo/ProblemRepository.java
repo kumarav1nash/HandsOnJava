@@ -10,6 +10,8 @@ public interface ProblemRepository {
     List<Problem> findAll();
     Optional<Problem> findById(String id);
     List<TestCase> findTestCasesByProblemId(String problemId);
+    // Includes hidden/non-sample test cases
+    List<TestCase> findAllTestCasesByProblemId(String problemId);
 
     // CRUD operations for admin or future features
     void saveProblem(Problem problem);

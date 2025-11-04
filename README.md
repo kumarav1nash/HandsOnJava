@@ -93,3 +93,12 @@ Examples:
 
 - Run with strict default: `./gradlew bootRun --args='--compare.mode.default=strict'`
 - Override one problem: add `compare.mode.p.two-sum=strict` to `application.yml`
+
+## Hidden Tests & Anti-Hardcode Protection
+- Interactive runs (`/api/solutions/run`) use sample tests only.
+- Submissions (`/api/solutions/submit`) run against all tests, including hidden cases.
+- Expected outputs are redacted in submission responses to avoid leaking answers.
+- Basic anti-hardcode detection flags submissions that contain expected outputs inline; flagged submissions are rejected even if tests pass.
+
+Notes:
+- Memory storage returns only sample tests; hidden tests require JPA storage with seeded non-sample cases.

@@ -29,6 +29,12 @@ public class MemoryProblemRepository implements ProblemRepository {
     }
 
     @Override
+    public List<TestCase> findAllTestCasesByProblemId(String problemId) {
+        // Memory repo has only samples; treat them as the complete set
+        return findTestCasesByProblemId(problemId);
+    }
+
+    @Override
     public void saveProblem(Problem problem) {
         throw new UnsupportedOperationException("Memory repository is read-only for problems");
     }

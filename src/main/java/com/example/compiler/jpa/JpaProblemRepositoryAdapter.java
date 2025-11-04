@@ -50,6 +50,11 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
     }
 
     @Override
+    public List<TestCase> findAllTestCasesByProblemId(String problemId) {
+        return testCases.findByProblem_Id(problemId).stream().map(JpaProblemRepositoryAdapter::toModel).collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void saveProblem(Problem problem) {
         ProblemEntity e = new ProblemEntity();
