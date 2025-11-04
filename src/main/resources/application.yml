@@ -39,3 +39,9 @@ management:
 
 storage:
   type: ${STORAGE_TYPE:memory}
+
+# Output comparison configuration
+compare:
+  mode:
+    # Default comparator mode: strict | lenient | very_lenient
+    default: lenient

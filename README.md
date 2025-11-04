@@ -74,3 +74,22 @@ Constraints and indexes:
 - If the backend fails to connect, confirm the container is healthy: `docker compose ps`
 - Verify env vars exported by `start.sh` (`DB_URL`, `DB_USER`, `DB_PASSWORD`, `STORAGE_TYPE`)
 - Remove persistent data to reinitialize: `rm -rf postgres-data` (will recreate on next start)
+
+## Output Comparison Modes
+You can control how solution output is compared against expected output:
+
+- `strict`: exact string match
+- `lenient`: normalized outputs (handles newline/CRLF differences)
+- `very_lenient`: normalized + trims and collapses extra whitespace
+
+Configure defaults and per-problem overrides:
+
+- Default mode in `application.yml`:
+  - `compare.mode.default: lenient`
+- Per-problem override via property (e.g., in `application.yml` or environment):
+  - `compare.mode.p.<problemId>: strict`
+
+Examples:
+
+- Run with strict default: `./gradlew bootRun --args='--compare.mode.default=strict'`
+- Override one problem: add `compare.mode.p.two-sum=strict` to `application.yml`

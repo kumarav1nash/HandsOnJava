@@ -9,15 +9,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import com.example.compiler.util.TextUtils;
+import com.example.compiler.compare.*;
+import com.example.compiler.config.ComparisonConfig;
 
 @RestController
 @RequestMapping(path = "/api/solutions", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SolutionsController {
     private final JavaRunnerService runner = new JavaRunnerService();
     private final ProblemRepository repo;
+    private final OutputComparatorFactory comparatorFactory;
+    private final ComparisonConfig comparisonConfig;
 
-    public SolutionsController(ProblemRepository repo) {
+    public SolutionsController(ProblemRepository repo, OutputComparatorFactory comparatorFactory, ComparisonConfig comparisonConfig) {
         this.repo = repo;
+        this.comparatorFactory = comparatorFactory;
+        this.comparisonConfig = comparisonConfig;
     }
 
     @PostMapping(path = "/run", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -26,9 +32,11 @@ public class SolutionsController {
         List<TestCase> samples = repo.findTestCasesByProblemId(p.getId());
 
         List<TestCaseResult> results = new ArrayList<>();
+        ComparatorMode mode = comparisonConfig.forProblem(p.getId());
+        OutputComparator comparator = comparatorFactory.get(mode);
         for (TestCase tc : samples) {
             JavaRunnerService.Result r = runner.compileAndRun(req.getCode(), tc.getInput());
-            boolean passed = TextUtils.normalizeOutput(r.stdout).equals(TextUtils.normalizeOutput(tc.getExpectedOutput())) && r.exitCode == 0;
+            boolean passed = comparator.compare(tc.getExpectedOutput(), r.stdout) && r.exitCode == 0;
             // Memory usage is not tracked for the external process; set null
             results.add(new TestCaseResult(tc.getInput(), tc.getExpectedOutput(), r.stdout, r.stderr, r.exitCode, r.durationMs, passed, null));
         }
