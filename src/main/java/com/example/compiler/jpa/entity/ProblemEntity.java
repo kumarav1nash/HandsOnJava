@@ -1,5 +1,6 @@
 package com.example.compiler.jpa.entity;
 
+import com.example.compiler.model.ProblemStatus;
 import javax.persistence.*;
 
 @Entity
@@ -24,6 +25,10 @@ public class ProblemEntity {
     @Column(name = "constraints", nullable = false, columnDefinition = "text")
     private String constraints;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ProblemStatus status = ProblemStatus.DRAFT;
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getTitle() { return title; }
@@ -36,4 +41,6 @@ public class ProblemEntity {
     public void setOutputSpec(String outputSpec) { this.outputSpec = outputSpec; }
     public String getConstraints() { return constraints; }
     public void setConstraints(String constraints) { this.constraints = constraints; }
+    public ProblemStatus getStatus() { return status; }
+    public void setStatus(ProblemStatus status) { this.status = status; }
 }

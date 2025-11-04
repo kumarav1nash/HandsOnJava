@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class WorkflowServiceTest {
     @Test
     void transitionsAndAuditWork() {
-        WorkflowService wf = new WorkflowService();
+        WorkflowService wf = new WorkflowService(new InMemoryWorkflowStatusStore());
         String pid = "wf-problem";
 
         assertEquals(ProblemStatus.DRAFT, wf.getStatus(pid));
@@ -35,7 +35,7 @@ class WorkflowServiceTest {
 
     @Test
     void invalidTransitionsThrow() {
-        WorkflowService wf = new WorkflowService();
+        WorkflowService wf = new WorkflowService(new InMemoryWorkflowStatusStore());
         String pid = "wf-invalid";
         assertThrows(IllegalStateException.class, () -> wf.publish(pid, "admin", null));
         assertThrows(IllegalStateException.class, () -> wf.requestChanges(pid, "mod", null));

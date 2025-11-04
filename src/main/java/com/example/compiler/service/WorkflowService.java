@@ -15,11 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class WorkflowService {
-    private final Map<String, ProblemStatus> statusByProblem = new ConcurrentHashMap<>();
+    private final WorkflowStatusStore statusStore;
     private final Map<String, List<AuditRecord>> auditByProblem = new ConcurrentHashMap<>();
 
+    public WorkflowService(WorkflowStatusStore statusStore) {
+        this.statusStore = statusStore;
+    }
+
     public ProblemStatus getStatus(String problemId) {
-        return statusByProblem.getOrDefault(problemId, ProblemStatus.DRAFT);
+        return statusStore.getStatus(problemId);
     }
 
     public List<AuditRecord> getAudit(String problemId) {
@@ -59,7 +63,7 @@ public class WorkflowService {
     }
 
     private ProblemStatus setStatus(String problemId, String actor, String action, ProblemStatus next, String comment) {
-        statusByProblem.put(problemId, next);
+        statusStore.setStatus(problemId, next);
         auditByProblem.computeIfAbsent(problemId, k -> new ArrayList<>())
                 .add(new AuditRecord(problemId, actor, action, System.currentTimeMillis(), comment));
         return next;
