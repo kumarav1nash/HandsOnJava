@@ -9,6 +9,7 @@ import ProblemTabs from './ProblemTabs'
 import ResultsPanel from './ResultsPanel'
 import classNames from 'classnames'
 import toast from 'react-hot-toast'
+import ProblemSpec from './ProblemSpec'
 
 const ProblemsSection = () => {
   const [problems, setProblems] = useState([])
@@ -120,30 +121,7 @@ const ProblemsSection = () => {
               >
                 {/* Left: Problem specification */}
                 <div className="pane pane--problem-spec" role="tabpanel" aria-labelledby="Description">
-                  <div className="card">
-                    <h4>Statement</h4>
-                    <p>{selected.statement}</p>
-                  </div>
-                  <div className="card">
-                    <h4>Input</h4>
-                    <p>{selected.inputSpec}</p>
-                  </div>
-                  <div className="card">
-                    <h4>Output</h4>
-                    <p>{selected.outputSpec}</p>
-                  </div>
-                  <div className="card">
-                    <h4>Constraints</h4>
-                    <p>{selected.constraints}</p>
-                  </div>
-                  <div className="card">
-                    <h4>Sample Test Cases</h4>
-                    <ul className="samples">
-                      {selected.samples.map((s, i) => (
-                        <li key={i}><code>Input:</code> {s.input.replace(/\n/g, '↵ ')}; <code>Output:</code> {s.expectedOutput.replace(/\n/g, '↵ ')}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  <ProblemSpec problem={selected} />
                 </div>
 
                 {/* Right: nested vertical split for editor and results */}
