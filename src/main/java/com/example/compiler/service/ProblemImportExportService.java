@@ -4,6 +4,7 @@ import com.example.compiler.model.Problem;
 import com.example.compiler.model.ProblemPack;
 import com.example.compiler.model.TestCase;
 import com.example.compiler.repo.ProblemRepository;
+import com.example.compiler.util.CsvUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +39,7 @@ public class ProblemImportExportService {
             }
         }
 
-        return new ProblemPack(base.getId(), base.getTitle(), base.getStatement(), base.getInputSpec(), base.getOutputSpec(), base.getConstraints(), samples, hidden);
+        return new ProblemPack(base.getId(), base.getTitle(), base.getStatement(), base.getInputSpec(), base.getOutputSpec(), base.getConstraints(), base.getTags(), samples, hidden);
     }
 
     public void importPack(ProblemPack pack) {
@@ -46,7 +47,7 @@ public class ProblemImportExportService {
         if (pack.getId() == null || pack.getTitle() == null) {
             throw new IllegalArgumentException("ProblemPack must include id and title");
         }
-        Problem p = new Problem(pack.getId(), pack.getTitle(), pack.getStatement(), pack.getInputSpec(), pack.getOutputSpec(), pack.getSamples(), pack.getConstraints());
+        Problem p = new Problem(pack.getId(), pack.getTitle(), pack.getStatement(), pack.getInputSpec(), pack.getOutputSpec(), pack.getSamples(), pack.getConstraints(), pack.getTags());
         repo.saveProblem(p);
         repo.deleteTestCasesByProblemId(p.getId());
         if (pack.getSamples() != null) {
@@ -74,7 +75,7 @@ public class ProblemImportExportService {
         List<TestCase> all = repo.findAllTestCasesByProblemId(problemId);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("id,title,statement,inputSpec,outputSpec,constraints,isSample,input,expectedOutput\n");
+        sb.append("id,title,statement,inputSpec,outputSpec,constraints,tags,isSample,input,expectedOutput\n");
         // Write samples
         for (TestCase t : samples) {
             sb.append(csvRow(base, true, t)).append('\n');
@@ -93,7 +94,7 @@ public class ProblemImportExportService {
     public String exportCsvAll() {
         List<Problem> problems = repo.findAll();
         StringBuilder sb = new StringBuilder();
-        sb.append("id,title,statement,inputSpec,outputSpec,constraints,isSample,input,expectedOutput\n");
+        sb.append("id,title,statement,inputSpec,outputSpec,constraints,tags,isSample,input,expectedOutput\n");
         for (Problem base : problems) {
             String pid = base.getId();
             List<TestCase> samples = repo.findTestCasesByProblemId(pid);
@@ -123,8 +124,8 @@ public class ProblemImportExportService {
         for (int i = start; i < lines.length; i++) {
             String line = lines[i].trim();
             if (line.isEmpty()) continue;
-            String[] cols = parseCsvLine(line);
-            if (cols.length < 9) continue; // skip malformed
+            String[] cols = CsvUtils.parseLine(line);
+            if (cols.length < 9) continue; // skip malformed (support old format)
             byProblem.computeIfAbsent(cols[0], k -> new java.util.ArrayList<>()).add(cols);
         }
         for (java.util.Map.Entry<String, java.util.List<String[]>> e : byProblem.entrySet()) {
@@ -137,92 +138,59 @@ public class ProblemImportExportService {
             String inputSpec = m[3];
             String outputSpec = m[4];
             String constraints = m[5];
-            Problem p = new Problem(id, title, statement, inputSpec, outputSpec, java.util.Collections.emptyList(), constraints);
+            java.util.List<String> tags = java.util.Collections.emptyList();
+            // Old format has 9 cols; new format adds tags at index 6
+            if (m.length >= 10) {
+                tags = parseTagsField(m[6]);
+            }
+            Problem p = new Problem(id, title, statement, inputSpec, outputSpec, java.util.Collections.emptyList(), constraints, tags);
             repo.saveProblem(p);
             repo.deleteTestCasesByProblemId(id);
             for (String[] r : rows) {
-                boolean isSample = Boolean.parseBoolean(r[6].trim());
-                String input = unescapeCsvField(r[7]);
-                String expected = unescapeCsvField(r[8]);
+                boolean isSample = Boolean.parseBoolean(r[m.length >= 10 ? 7 : 6].trim());
+                String input = CsvUtils.unescapeField(r[m.length >= 10 ? 8 : 7]);
+                String expected = CsvUtils.unescapeField(r[m.length >= 10 ? 9 : 8]);
                 repo.saveTestCase(id, new TestCase(input, expected), isSample);
             }
         }
     }
 
     private static String csvRow(Problem base, boolean isSample, TestCase t) {
-        return joinCsv(new String[]{
+        return CsvUtils.join(new String[]{
                 base.getId(),
                 base.getTitle(),
                 safe(base.getStatement()),
                 safe(base.getInputSpec()),
                 safe(base.getOutputSpec()),
                 safe(base.getConstraints()),
+                CsvUtils.escapeField(joinTags(base.getTags())),
                 String.valueOf(isSample),
-                escapeCsvField(t.getInput()),
-                escapeCsvField(t.getExpectedOutput())
+                CsvUtils.escapeField(t.getInput()),
+                CsvUtils.escapeField(t.getExpectedOutput())
         });
-    }
-
-    private static String joinCsv(String[] fields) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < fields.length; i++) {
-            if (i > 0) sb.append(',');
-            sb.append(fields[i] == null ? "" : fields[i]);
-        }
-        return sb.toString();
-    }
-
-    private static String escapeCsvField(String s) {
-        if (s == null) return "";
-        // Use simple escaping by replacing newlines with \n and quotes with doubled quotes, wrap in quotes
-        String v = s.replace("\r", "").replace("\n", "\\n").replace("\"", "\"\"");
-        return '"' + v + '"';
-    }
-
-    private static String unescapeCsvField(String s) {
-        if (s == null) return "";
-        String v = s;
-        if (v.length() >= 2 && v.startsWith("\"") && v.endsWith("\"")) {
-            v = v.substring(1, v.length() - 1);
-        }
-        v = v.replace("\"\"", "\"").replace("\\n", "\n");
-        return v;
     }
 
     private static String safe(String s) {
         return s == null ? "" : s;
     }
 
-    private static String[] parseCsvLine(String line) {
+    // CSV helpers moved to CsvUtils
+
+    private static java.util.List<String> parseTagsField(String field) {
+        String raw = CsvUtils.unescapeField(field);
+        if (raw == null || raw.trim().isEmpty()) return java.util.Collections.emptyList();
+        // Split on comma or pipe with optional surrounding whitespace
+        String[] parts = raw.split("\\s*[\\|,]\\s*");
         java.util.List<String> out = new java.util.ArrayList<>();
-        StringBuilder cur = new StringBuilder();
-        boolean inQuotes = false;
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-            if (inQuotes) {
-                if (c == '\"') {
-                    // Lookahead for doubled quote
-                    if (i + 1 < line.length() && line.charAt(i + 1) == '\"') {
-                        cur.append('\"');
-                        i++; // skip next
-                    } else {
-                        inQuotes = false;
-                    }
-                } else {
-                    cur.append(c);
-                }
-            } else {
-                if (c == ',') {
-                    out.add(cur.toString());
-                    cur.setLength(0);
-                } else if (c == '\"') {
-                    inQuotes = true;
-                } else {
-                    cur.append(c);
-                }
-            }
+        for (String p : parts) {
+            String tag = p.trim();
+            if (!tag.isEmpty()) out.add(tag);
         }
-        out.add(cur.toString());
-        return out.toArray(new String[0]);
+        return out;
+    }
+
+    private static String joinTags(java.util.List<String> tags) {
+        if (tags == null || tags.isEmpty()) return "";
+        return String.join(",", tags);
     }
 }

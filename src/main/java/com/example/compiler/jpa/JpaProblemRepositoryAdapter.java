@@ -24,7 +24,7 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
     }
 
     private static Problem toModel(ProblemEntity e) {
-        return new Problem(e.getId(), e.getTitle(), e.getStatement(), e.getInputSpec(), e.getOutputSpec(), java.util.Collections.emptyList(), e.getConstraints());
+        return new Problem(e.getId(), e.getTitle(), e.getStatement(), e.getInputSpec(), e.getOutputSpec(), java.util.Collections.emptyList(), e.getConstraints(), parseTags(e.getTags()));
     }
 
     private static TestCase toModel(TestCaseEntity e) {
@@ -64,6 +64,7 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
         e.setInputSpec(problem.getInputSpec());
         e.setOutputSpec(problem.getOutputSpec());
         e.setConstraints(problem.getConstraints());
+        e.setTags(joinTags(problem.getTags()));
         problems.save(e);
     }
 
@@ -84,6 +85,23 @@ public class JpaProblemRepositoryAdapter implements ProblemRepository {
         t.setExpectedOutput(testCase.getExpectedOutput());
         t.setSample(true);
         testCases.save(t);
+    }
+
+    private static java.util.List<String> parseTags(String s) {
+        if (s == null || s.trim().isEmpty()) return java.util.Collections.emptyList();
+        // Split on comma or pipe with optional surrounding whitespace
+        String[] parts = s.split("\\s*[\\|,]\\s*");
+        java.util.List<String> out = new java.util.ArrayList<>();
+        for (String p : parts) {
+            String tag = p.trim();
+            if (!tag.isEmpty()) out.add(tag);
+        }
+        return out;
+    }
+
+    private static String joinTags(java.util.List<String> tags) {
+        if (tags == null || tags.isEmpty()) return null;
+        return String.join(",", tags.stream().map(String::trim).filter(t -> !t.isEmpty()).collect(java.util.stream.Collectors.toList()));
     }
 
     @Override

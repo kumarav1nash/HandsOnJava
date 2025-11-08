@@ -25,6 +25,10 @@ public class ProblemEntity {
     @Column(name = "constraints", nullable = false, columnDefinition = "text")
     private String constraints;
 
+    // New: comma-separated tags (normalized on import/export)
+    @Column(name = "tags", columnDefinition = "text")
+    private String tags;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ProblemStatus status = ProblemStatus.DRAFT;
@@ -43,4 +47,6 @@ public class ProblemEntity {
     public void setConstraints(String constraints) { this.constraints = constraints; }
     public ProblemStatus getStatus() { return status; }
     public void setStatus(ProblemStatus status) { this.status = status; }
+    public String getTags() { return tags; }
+    public void setTags(String tags) { this.tags = tags; }
 }

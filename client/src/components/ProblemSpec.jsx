@@ -5,9 +5,17 @@ export default function ProblemSpec({ problem }) {
 
   const samples = Array.isArray(problem.samples) ? problem.samples : []
   const hints = Array.isArray(problem.hints) ? problem.hints : []
+  const tags = Array.isArray(problem.tags) ? problem.tags : []
 
   return (
     <div className="problem-spec">
+      {tags.length > 0 && (
+        <div className="chip-group" aria-label="Problem tags" style={{ marginBottom: 'var(--space-sm)' }}>
+          {tags.map((t) => (
+            <span key={t} className="chip chip--soft" title={t}>{t}</span>
+          ))}
+        </div>
+      )}
       <div className="card">
         <h4>Statement</h4>
         <p>{problem.statement}</p>

@@ -11,6 +11,8 @@ public class OutputComparatorFactory {
                 return new StrictOutputComparator();
             case VERY_LENIENT:
                 return new VeryLenientOutputComparator();
+            case ALTERNATIVES:
+                return new AlternativesOutputComparator();
             case LENIENT:
             default:
                 return new LenientOutputComparator();

@@ -1,0 +1,5 @@
+id,title,statement,inputSpec,outputSpec,constraints,isSample,input,expectedOutput
+p100,Two Sum,"Given an array and a target, return indices of two numbers that add up to target.","First line N, second line N space-separated integers, third line target","Two indices i j (0-based)","1 <= N <= 1e5",true,"4\n1 3 7 9\n10","0 3||1 2\n"
+p100,Two Sum,"Given an array and a target, return indices of two numbers that add up to target.","First line N, second line N space-separated integers, third line target","Two indices i j (0-based)","1 <= N <= 1e5",false,"5\n2 8 11 15 7\n9","0 4\n"
+p101,Reverse Words,"Reverse the order of words in a string.","One line containing space-separated words","One line with words in reverse order","length <= 10^5",true,"hello world\n","world hello\n"
+p101,Reverse Words,"Reverse the order of words in a string.","One line containing space-separated words","One line with words in reverse order","length <= 10^5",false,"foo bar baz\n","baz bar foo\n"

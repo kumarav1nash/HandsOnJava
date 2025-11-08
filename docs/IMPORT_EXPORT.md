@@ -58,16 +58,17 @@ TestCase {
 Header:
 
 ```
-id,title,statement,inputSpec,outputSpec,constraints,isSample,input,expectedOutput
+id,title,statement,inputSpec,outputSpec,constraints,tags,isSample,input,expectedOutput
 ```
 
 Notes:
 - Each row represents one test case. Problem metadata is repeated across rows for the same `id`.
 - `isSample` is `true` for visible/sample tests and `false` for hidden tests.
 - Newlines in `input` and `expectedOutput` are escaped as `\n`; quotes are doubled per CSV rules.
+- `tags` is optional and may be a comma-separated list like `dp,graph,string`. If omitted, the importer accepts the legacy 9-column format.
 
 Example row:
 
 ```
-two-sum,Two Sum,"Given an array...",n,indices,"1 <= n <= 1e5",true,"3\n1 2 3\n3","0 1"
+two-sum,Two Sum,"Given an array...",n,indices,"1 <= n <= 1e5","array,string",true,"3\n1 2 3\n3","0 1"
 ```

@@ -1,10 +1,12 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import { useI18n } from './i18n/useI18n.js'
 import EditorPane from './components/EditorPane'
 import ContextMenu from './design-system/components/ContextMenu'
 import ProblemsSection from './components/ProblemsSection'
 import AdminPanel from './components/AdminPanel'
+import ProblemsCatalog from './pages/ProblemsCatalog.jsx'
 import Header from './components/Header'
 import OutputPane from './components/OutputPane'
 import { runJava } from './services/compilerClient'
@@ -173,6 +175,39 @@ function App() {
     toast.success('Example loaded')
   }, [])
 
+  // Routing: sync mode with URL for Admin route
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // Derive active mode for header highlighting
+  // Treat /admin as Admin, and /catalog or /problems as Problems
+  const activeMode = location.pathname.startsWith('/admin')
+    ? 'Admin'
+    : (location.pathname.startsWith('/catalog') || location.pathname.startsWith('/problems'))
+      ? 'Problems'
+      : mode
+
+  // When user toggles Admin from header, navigate to /admin. For others, navigate to /
+  const onNavMode = useCallback((next) => {
+    if (next === 'Admin') {
+      if (!location.pathname.startsWith('/admin')) navigate('/admin')
+      setMode('Admin')
+      localStorage.setItem('app_mode', 'Admin')
+    } else if (next === 'Problems') {
+      if (!location.pathname.startsWith('/catalog') && !location.pathname.startsWith('/problems')) {
+        navigate('/catalog')
+      }
+      setMode('Problems')
+      localStorage.setItem('app_mode', 'Problems')
+    } else {
+      if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/catalog') || location.pathname.startsWith('/problems')) {
+        navigate('/')
+      }
+      setMode(next)
+      localStorage.setItem('app_mode', next)
+    }
+  }, [location.pathname, navigate])
+
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
@@ -228,17 +263,21 @@ function App() {
         hasUnsavedChanges={hasUnsavedChanges}
         lastSaved={lastSaved}
         isOnline={isOnline}
-        mode={mode}
-        onModeToggle={onModeToggle}
+        mode={activeMode}
+        onModeToggle={onNavMode}
         problemNav={problemNav}
       />
       
       <main className="app__main" role="main">
         {/* Mode navigation moved to Header */}
 
-        {mode === 'Admin' ? (
+        {location.pathname.startsWith('/admin') ? (
           <AdminPanel />
-        ) : mode === 'Compiler' ? (
+        ) : location.pathname.startsWith('/catalog') ? (
+          <ProblemsCatalog />
+        ) : location.pathname.startsWith('/problems') ? (
+          <ProblemsSection onProblemNavChange={setProblemNav} />
+        ) : activeMode === 'Compiler' ? (
           <SplitPane 
             direction="horizontal"
             sizes={[60, 40]} 
@@ -381,7 +420,7 @@ function App() {
             </section>
           </SplitPane>
         ) : (
-          <ProblemsSection onProblemNavChange={setProblemNav} />
+          <ProblemsCatalog />
         )}
       </main>
       

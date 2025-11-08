@@ -22,7 +22,13 @@ const ResultsPanel = ({ response }) => {
               <div key={i} className="output">
                 <div className="output__title">Test #{i + 1} — {r.passed ? 'Pass' : 'Fail'}</div>
                 <pre className={classNames('output__content', { success: r.passed, error: !r.passed })}>
-{`Input:\n${r.input}\nExpected:\n${r.expectedOutput}\nActual:\n${r.actualOutput}\nExit: ${r.exitCode} • ${r.durationMs} ms`}
+{(() => {
+  const hasStdout = r?.actualOutput && String(r.actualOutput).trim()
+  const hasStderr = r?.stderr && String(r.stderr).trim()
+  const label = r.exitCode === 0 ? 'Actual' : (hasStderr ? 'Error' : 'Actual')
+  const content = hasStdout ? r.actualOutput : (hasStderr ? r.stderr : '')
+  return `Input:\n${r.input}\nExpected:\n${r.expectedOutput}\n${label}:\n${content}\nExit: ${r.exitCode} • ${r.durationMs} ms`
+})()}
                 </pre>
               </div>
             ))}

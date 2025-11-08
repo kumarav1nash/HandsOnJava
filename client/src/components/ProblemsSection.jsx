@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { listProblems, getProblem } from '../services/problemsClient'
 import { runSolution, submitSolution } from '../services/solutionsClient'
 import EditorPane from './EditorPane'
@@ -23,20 +24,25 @@ const ProblemsSection = ({ onProblemNavChange }) => {
   const [autoScrollResults, setAutoScrollResults] = useState(false)
   const [activeTab, setActiveTab] = useState('Description')
   const [theme, setTheme] = useState(localStorage.getItem('editor_theme') || 'vs-dark')
+  const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function load() {
       try {
         const list = await listProblems()
         setProblems(list)
+        // Prefer ID from route; fallback to first problem
+        const routeMatch = location.pathname.match(/^\/problems\/(.+)$/)
+        const routeId = routeMatch?.[1] || null
         const first = list?.[0]?.id || null
-        if (first) setSelectedId(first)
+        setSelectedId(routeId || first)
       } catch (e) {
         toast.error('Failed to load problems')
       }
     }
     load()
-  }, [])
+  }, [location.pathname])
 
   useEffect(() => {
     async function loadDetail() {
@@ -115,6 +121,16 @@ const ProblemsSection = ({ onProblemNavChange }) => {
       setAutoScrollResults(false)
     }
   }, [results, autoScrollResults])
+
+  // Keep URL in sync with selected problem when user navigates internally
+  useEffect(() => {
+    if (!selectedId) return
+    // Only push when on /problems route; avoid interfering with other pages
+    if (location.pathname.startsWith('/problems')) {
+      const expected = `/problems/${selectedId}`
+      if (location.pathname !== expected) navigate(expected, { replace: false })
+    }
+  }, [selectedId])
 
   // Compute and expose header-level problem navigation whenever list/selection changes
   useEffect(() => {
