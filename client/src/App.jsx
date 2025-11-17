@@ -7,6 +7,8 @@ import ContextMenu from './design-system/components/ContextMenu'
 import ProblemsSection from './components/ProblemsSection'
 import AdminPanel from './components/AdminPanel'
 import ProblemsCatalog from './pages/ProblemsCatalog.jsx'
+import Learn from './pages/Learn.jsx'
+import LearnConcept from './pages/learn/Concept.jsx'
 import Header from './components/Header'
 import OutputPane from './components/OutputPane'
 import { runJava } from './services/compilerClient'
@@ -183,7 +185,7 @@ function App() {
   // Treat /admin as Admin, and /catalog or /problems as Problems
   const activeMode = location.pathname.startsWith('/admin')
     ? 'Admin'
-    : (location.pathname.startsWith('/catalog') || location.pathname.startsWith('/problems'))
+    : (location.pathname.startsWith('/catalog') || location.pathname.startsWith('/problems') || location.pathname.startsWith('/learn'))
       ? 'Problems'
       : mode
 
@@ -277,6 +279,15 @@ function App() {
           <ProblemsCatalog />
         ) : location.pathname.startsWith('/problems') ? (
           <ProblemsSection onProblemNavChange={setProblemNav} />
+        ) : location.pathname.startsWith('/learn') ? (
+          (() => {
+            const parts = location.pathname.split('/').filter(Boolean)
+            if (parts.length > 1) {
+              const conceptId = parts[1]
+              return <LearnConcept conceptId={conceptId} />
+            }
+            return <Learn />
+          })()
         ) : activeMode === 'Compiler' ? (
           <SplitPane 
             direction="horizontal"

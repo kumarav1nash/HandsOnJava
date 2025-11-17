@@ -94,6 +94,129 @@ public class GeminiLLMService implements LLMService {
         return new GenerationResult(code == null ? text : code, notes);
     }
 
+    @Override
+    public java.util.List<GeneratedCase> generateTestCases(Problem problem, String code, int count) throws Exception {
+        if (isBlank(apiKey)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
+                "Google GenAI API key is not configured (google.genai.apiKey)"
+            );
+        }
+
+        int n = Math.max(1, Math.min(20, count));
+        String userPrompt = buildTestCasePrompt(problem, code, n);
+        String url = String.format("%s/%s/models/%s:generateContent?key=%s", endpoint, apiVersion, model, apiKey);
+
+        String payload = "{\n" +
+                "  \"contents\": [\n" +
+                "    {\n" +
+                "      \"role\": \"user\",\n" +
+                "      \"parts\": [ { \"text\": " + jsonString(userPrompt) + " } ]\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"generationConfig\": {\n" +
+                "    \"temperature\": 0.2,\n" +
+                "    \"topK\": 40,\n" +
+                "    \"topP\": 0.9\n" +
+                "  }\n" +
+                "}";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<String>(payload, headers);
+
+        ResponseEntity<String> resp;
+        try {
+            resp = restTemplate.postForEntity(url, entity, String.class);
+        } catch (org.springframework.web.client.RestClientResponseException e) {
+            String body = e.getResponseBodyAsString();
+            org.springframework.http.HttpStatus status;
+            try { status = org.springframework.http.HttpStatus.valueOf(e.getRawStatusCode()); } catch (IllegalArgumentException iae) { status = org.springframework.http.HttpStatus.BAD_GATEWAY; }
+            throw new org.springframework.web.server.ResponseStatusException(status, "GenAI API error: " + (body == null ? e.getMessage() : body));
+        } catch (org.springframework.web.client.ResourceAccessException e) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_GATEWAY, "GenAI network error: " + e.getMessage(), e);
+        }
+
+        if (!resp.getStatusCode().is2xxSuccessful()) {
+            String body = resp.getBody();
+            throw new org.springframework.web.server.ResponseStatusException(resp.getStatusCode(), "GenAI API error: " + (body == null ? "" : body));
+        }
+
+        String text = extractTextFromResponse(resp.getBody());
+        java.util.List<GeneratedCase> out = parseGeneratedCases(text);
+        return out;
+    }
+
+    private String buildTestCasePrompt(Problem p, String code, int count) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("You will create additional test cases for the given programming problem and its Java solution.\\n");
+        sb.append("Return ONLY valid JSON (no code fences, no explanations).\\n");
+        sb.append("The JSON MUST be an array of objects with fields: input, expectedOutput.\\n");
+        sb.append("Ensure inputs match the problem's input format and expectedOutput matches exact output format.\\n");
+        sb.append("Generate ").append(count).append(" diverse test cases including edge cases.\\n\\n");
+
+        sb.append("Problem ID: ").append(p.getId()).append("\\n");
+        sb.append("Title: ").append(p.getTitle()).append("\\n\\n");
+        sb.append("Statement:\n").append(p.getStatement()).append("\\n\\n");
+        sb.append("Input Spec:\n").append(p.getInputSpec()).append("\\n\\n");
+        sb.append("Output Spec:\n").append(p.getOutputSpec()).append("\\n\\n");
+        sb.append("Constraints:\n").append(p.getConstraints() == null ? "" : p.getConstraints()).append("\\n\\n");
+
+        if (!isBlank(code)) {
+            sb.append("Reference Java solution (use this to derive expected outputs):\\n");
+            sb.append(code).append("\\n\\n");
+        }
+
+        sb.append("STRICT OUTPUT: JSON array like: ");
+        sb.append("[{\"input\":\"<input>\",\"expectedOutput\":\"<output>\"}]\\n");
+        return sb.toString();
+    }
+
+    private java.util.List<GeneratedCase> parseGeneratedCases(String text) {
+        java.util.List<GeneratedCase> result = new java.util.ArrayList<>();
+        if (isBlank(text)) return result;
+        String json = text.trim();
+        // If wrapped in code fences, try to extract JSON block
+        java.util.regex.Pattern fenced = java.util.regex.Pattern.compile("```(?:json)?\\n(.*?)```", java.util.regex.Pattern.DOTALL);
+        java.util.regex.Matcher fm = fenced.matcher(json);
+        if (fm.find()) { json = fm.group(1).trim(); }
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            if (root.isArray()) {
+                for (JsonNode n : root) {
+                    String input = n.path("input").asText(null);
+                    String expected = n.path("expectedOutput").asText(null);
+                    if (!isBlank(input) && !isBlank(expected)) {
+                        result.add(new GeneratedCase(input, expected));
+                    }
+                }
+            } else {
+                // Single object
+                String input = root.path("input").asText(null);
+                String expected = root.path("expectedOutput").asText(null);
+                if (!isBlank(input) && !isBlank(expected)) {
+                    result.add(new GeneratedCase(input, expected));
+                }
+            }
+        } catch (Exception e) {
+            // Fallback: try regex to find JSON-like objects
+            java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\{[^}]*\\}", java.util.regex.Pattern.DOTALL);
+            java.util.regex.Matcher m = p.matcher(json);
+            while (m.find()) {
+                String obj = m.group();
+                try {
+                    JsonNode n = objectMapper.readTree(obj);
+                    String input = n.path("input").asText(null);
+                    String expected = n.path("expectedOutput").asText(null);
+                    if (!isBlank(input) && !isBlank(expected)) {
+                        result.add(new GeneratedCase(input, expected));
+                    }
+                } catch (Exception ignore) {}
+            }
+        }
+        return result;
+    }
+
     private String buildPrompt(Problem p, String adminPrompt) {
         StringBuilder sb = new StringBuilder();
         sb.append("You are an expert Java developer. Generate a complete, compilable Java solution for the following problem.\n");

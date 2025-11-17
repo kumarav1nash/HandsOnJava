@@ -22,4 +22,14 @@
   "app.mode.compiler": "कंपाइलर",
   "app.mode.problems": "प्रॉब्लम्स",
   "app.mode.admin": "एडमिन"
+  ,
+  "learn.title": "जावा सीखें",
+  "learn.subtitle": "इंटरएक्टिव कोडिंग के साथ हैंड्स‑ऑन कॉन्सेप्ट्स",
+  "learn.steps.title": "चरण",
+  "learn.input.label": "प्रोग्राम इनपुट (stdin)",
+  "learn.verify.success": "चरण सत्यापित",
+  "learn.verify.fail": "सत्यापन विफल",
+  "learn.reset": "रीसेट",
+  "learn.search.placeholder": "कॉन्सेप्ट्स खोजें",
+  "learn.tags.aria": "कॉन्सेप्ट टैग्स"
 }

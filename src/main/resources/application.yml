@@ -54,7 +54,7 @@ compare:
     default: lenient
     # Per-problem override examples:
     # Accept multiple alternatives using "||" in expected output for problem p100 (Two Sum)
-  p:
+    p:
       p100: alternatives
 
 # Google AI Studio (Generative Language API) configuration

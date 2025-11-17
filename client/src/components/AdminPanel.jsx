@@ -14,6 +14,7 @@ import LLMPlayground from '../admin/pages/LLMPlayground'
 
 function AdminLayoutShell() {
   const navigate = useNavigate()
+  const [collapsed, setCollapsed] = useState(false)
 
   // Keyboard nav: g then key to go to sections (accessibility/efficiency)
   useEffect(() => {
@@ -37,10 +38,13 @@ function AdminLayoutShell() {
   }, [navigate])
 
   return (
-    <div className="admin-layout" aria-label="Admin dashboard layout">
-      <aside className="admin-sidebar" aria-label="Admin Navigation">
+    <div className={`admin-layout ${collapsed ? 'admin-layout--sidebar-collapsed' : ''}`} aria-label="Admin dashboard layout">
+      <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`} aria-label="Admin Navigation">
         <div className="admin-sidebar__header">
           <h2 className="admin-title">Admin</h2>
+          <button className="btn btn--icon sidebar-toggle" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setCollapsed(v => !v)}>
+            {collapsed ? '»' : '«'}
+          </button>
         </div>
         <nav className="admin-nav" aria-label="Primary">
           <NavLink end to="/admin" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Overview</NavLink>

@@ -16,3 +16,13 @@ export async function executeCandidate({ problemId, code }) {
   const { data } = await axios.post(`${BASE}/api/admin/playground/execute`, { problemId, code, language: 'java' }, { headers: authHeaders() })
   return data
 }
+
+export async function generateTestCases({ problemId, code, count = 5 }) {
+  const { data } = await axios.post(`${BASE}/api/admin/playground/generate-testcases`, { problemId, code, count }, { headers: authHeaders() })
+  return data
+}
+
+export async function saveTestCases({ problemId, cases, hidden = true }) {
+  const { data } = await axios.post(`${BASE}/api/admin/playground/save-testcases`, { problemId, cases, hidden }, { headers: authHeaders() })
+  return data
+}

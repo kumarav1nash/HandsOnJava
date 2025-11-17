@@ -512,6 +512,22 @@ body { overflow: auto; }
   min-height: 120px;
 }
 
+/* Compact variant for small controls (e.g., selects) */
+.input--compact {
+  min-height: auto;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  resize: none;
+}
+
+/* Shrink select height when using .input styling */
+select.input {
+  min-height: auto;
+  padding: var(--space-sm) var(--space-md);
+  line-height: 1.2;
+  resize: none;
+}
+
 .input:focus {
   outline: none;
   border-color: var(--color-primary);
@@ -972,6 +988,13 @@ body { overflow: auto; }
 
 .admin-sidebar__header { margin-bottom: var(--space-md); }
 .admin-title { font-size: 1.25rem; margin: 0; }
+.sidebar-toggle { margin-left: auto; padding: var(--space-xs) var(--space-sm); }
+
+.admin-layout--sidebar-collapsed { grid-template-columns: 56px 1fr; }
+.admin-sidebar.collapsed { padding: var(--space-sm); }
+.admin-sidebar.collapsed .admin-title { display: none; }
+.admin-sidebar.collapsed .admin-nav__section-title, 
+.admin-sidebar.collapsed .admin-nav { display: none; }
 
 .admin-nav__section { margin-top: var(--space-md); }
 .admin-nav__section-title { 
@@ -1029,7 +1052,7 @@ body { overflow: auto; }
   border-radius: .5rem;
   min-height: 120px;
 }
-.panel__header { padding: var(--space-sm) var(--space-md); border-bottom: 1px solid var(--color-border); }
+.panel__header { padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-border); }
 .panel__content { padding: var(--space-md); }
 
 .event-list { list-style: none; padding: 0; margin: 0; }
@@ -1040,6 +1063,7 @@ body { overflow: auto; }
 .badge.error { background: #ef444420; color: #ef4444; }
 
 .grid-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg); }
+.grid-two--collapse-left { display: grid; grid-template-columns: 1fr; gap: var(--space-lg); }
 .subtabs { display: flex; gap: var(--space-sm); }
 
 .chart-mini { width: 100%; max-width: 100%; }
@@ -1076,3 +1100,48 @@ body { overflow: auto; }
 .badge.easy { background: #1b5e20; color: #e8f5e9; border-radius: 12px; padding: 2px 8px; font-size: 12px; }
 .badge.medium { background: #283593; color: #e8eaf6; border-radius: 12px; padding: 2px 8px; font-size: 12px; }
 .badge.hard { background: #b71c1c; color: #ffebee; border-radius: 12px; padding: 2px 8px; font-size: 12px; }
+
+/* LLM Playground layout helpers */
+.llm-left-grid { 
+  display: grid; 
+  grid-template-rows: 8fr 2fr; /* 80% code, 20% controls */
+  gap: var(--space-md); 
+  height: 78vh; /* viewport-relative to avoid page scroll */
+  min-height: 0; 
+}
+.llm-code-area { 
+  min-height: 0; 
+  display: flex; 
+  flex-direction: column; 
+}
+.llm-bottom-controls-grid { 
+  display: grid; 
+  grid-template-columns: 1fr; /* full-width prompt */
+  gap: var(--space-md); 
+  align-items: start; 
+}
+.llm-actions-row { 
+  display: flex; 
+  gap: var(--space-sm); 
+  flex-wrap: wrap; 
+}
+
+/* Right panel: scrollable container and section styles */
+.llm-right-scroll {
+  height: 78vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+.llm-right-selector { margin-bottom: var(--space-md); }
+.llm-right-selector .input { width: 100%; }
+.llm-desc-editor {
+  width: 100%;
+  min-height: 140px;
+}
+.llm-desc-card, .llm-results-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: var(--space-md);
+}
