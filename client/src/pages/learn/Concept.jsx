@@ -4,7 +4,7 @@ import { useI18n } from '../../i18n/useI18n.js'
 import { findConcept, concepts } from './concepts'
 import InlineCodeRunner from './InlineCodeRunner'
 
-export default function Concept({ conceptId }) {
+export default function Concept({ conceptId, hideNav }) {
   const navigate = useNavigate()
   const concept = useMemo(() => findConcept(conceptId), [conceptId])
   const { t } = useI18n()
@@ -27,16 +27,17 @@ export default function Concept({ conceptId }) {
       height: '100%',
       overflowY: 'auto',
       padding: '2rem',
-      maxWidth: '800px',
+      maxWidth: 'var(--content-width, 800px)',
       margin: '0 auto'
     }}>
       <header style={{ marginBottom: '2rem', borderBottom: '1px solid var(--border-color, #333)', paddingBottom: '1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
           <h1 style={{ margin: 0, fontSize: '2rem' }}>{concept.title}</h1>
-          <div className="toolbar">
-            <button className="btn" onClick={goPrev} disabled={!prevId} title={t('learn.nav.prev')}>← {t('learn.nav.prev')}</button>
-            <button className="btn" onClick={goNext} disabled={!nextId} title={t('learn.nav.next')} style={{ marginLeft: '0.5rem' }}>{t('learn.nav.next')} →</button>
-          </div>
+          {!hideNav && (
+            <div className="toolbar">
+              <button className="btn" onClick={goPrev} disabled={!prevId} title={t('learn.nav.prev')}>← {t('learn.nav.prev')}</button>
+            </div>
+          )}
         </div>
         <p className="muted" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>{concept.summary}</p>
       </header>
@@ -103,12 +104,14 @@ export default function Concept({ conceptId }) {
         )}
       </section>
 
-      <div style={{ marginTop: '4rem', textAlign: 'center', paddingBottom: '2rem' }}>
-        <p className="muted">Ready to test your knowledge?</p>
-        <button className="btn btn--primary btn--lg" onClick={goNext} disabled={!nextId}>
-          Next: Practice & Quiz →
-        </button>
-      </div>
+      {!hideNav && (
+        <div style={{ marginTop: '4rem', textAlign: 'center', paddingBottom: '2rem' }}>
+          <p className="muted">Ready to test your knowledge?</p>
+          <button className="btn btn--primary btn--lg" onClick={goNext} disabled={!nextId}>
+            Next: Practice & Quiz →
+          </button>
+        </div>
+      )}
     </div>
   )
 }
