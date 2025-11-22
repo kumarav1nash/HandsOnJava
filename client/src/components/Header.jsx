@@ -19,7 +19,7 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
     if (!date) return ''
     const now = new Date()
     const diff = now - date
-    
+
     if (diff < 60000) return 'just now'
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
     if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
@@ -32,7 +32,7 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
       <div className="header__left">
         {mode === 'Problems' && problemNav && (
           <div className="header__problem-nav header__problem-nav--left" role="group" aria-label="Problem navigation">
-            <button 
+            <button
               className="btn btn--ghost"
               onClick={problemNav.onPrev}
               disabled={!problemNav.hasPrev}
@@ -41,7 +41,7 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
             >
               ‹ Prev
             </button>
-            <button 
+            <button
               className="btn btn--ghost"
               onClick={problemNav.onNext}
               disabled={!problemNav.hasNext}
@@ -54,7 +54,7 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
         )}
         <div className="header__status">
           {/* Connection Status */}
-          <div 
+          <div
             className={classNames('status-indicator', {
               'status-indicator--online': isOnline,
               'status-indicator--offline': !isOnline
@@ -67,12 +67,12 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
               {isOnline ? t('status.online') : t('status.offline')}
             </span>
           </div>
-          
+
           {/* Save Status */}
           {(hasUnsavedChanges || saved || lastSaved) && (
             <div className="save-status">
               {hasUnsavedChanges ? (
-                <span 
+                <span
                   className="save-status__indicator save-status__indicator--unsaved"
                   title="Unsaved changes"
                   aria-label="You have unsaved changes"
@@ -81,7 +81,7 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
                   <span className="save-status__text">{t('save.unsaved')}</span>
                 </span>
               ) : saved ? (
-                <span 
+                <span
                   className={classNames('save-status__indicator', 'save-status__indicator--saved', { visible: saved })}
                   title={t('save.saved')}
                   aria-label={t('save.saved')}
@@ -90,7 +90,7 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
                   <span className="save-status__text">{t('save.saved')}</span>
                 </span>
               ) : lastSaved ? (
-                <span 
+                <span
                   className="save-status__indicator save-status__indicator--timestamp"
                   title={`Last saved: ${lastSaved.toLocaleString()}`}
                   aria-label={`Last saved ${formatLastSaved(lastSaved)}`}
@@ -105,7 +105,7 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
         </div>
 
         <div className="header__actions">
-          <button 
+          <button
             className={classNames('btn', 'btn--secondary', 'theme-toggle')}
             onClick={onThemeToggle}
             aria-label={`Switch to ${theme === 'vs-dark' ? t('theme.light') : t('theme.dark')} theme`}
@@ -120,51 +120,66 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
           </button>
           <LocaleSwitcher />
         </div>
+
+        <div className="header__mode-toggle" style={{ marginLeft: '1rem' }}>
+          <button
+            className={classNames('btn', 'btn--sm', {
+              'btn--primary': mode === 'Learn',
+              'btn--secondary': mode !== 'Learn'
+            })}
+            onClick={() => onModeToggle && onModeToggle(mode === 'Learn' ? 'practice' : 'learn')}
+            title={mode === 'Learn' ? 'Switch to Practice Mode' : 'Switch to Learn Mode'}
+          >
+            {mode === 'Learn' ? '📖 Learn' : '💻 Practice'}
+          </button>
+        </div>
       </div>
 
       <div className="header__brand">
-        <img 
-          src="/vite.svg" 
-          className="logo" 
-          alt={t('header.brand_alt')} 
+        <img
+          src="/vite.svg"
+          className="logo"
+          alt={t('header.brand_alt')}
           role="img"
         />
         <h1 className="header__title">
           {t('header.title')}
         </h1>
       </div>
-      
-      {/* Top-level navigation: Compiler, Problems, Admin */}
-      <nav className="header__nav" aria-label="Primary">
-        <button 
-          className={classNames('btn', 'btn--ghost', { active: mode === 'Compiler' })}
-          role="tab"
-          aria-selected={mode === 'Compiler'}
-          onClick={() => onModeToggle?.('Compiler')}
-          title={t('app.mode.compiler')}
-        >
-          {t('app.mode.compiler')}
-        </button>
-        <button 
-          className={classNames('btn', 'btn--ghost', { active: mode === 'Problems' })}
-          role="tab"
-          aria-selected={mode === 'Problems'}
-          onClick={() => onModeToggle?.('Problems')}
-          title={t('app.mode.problems')}
-        >
-          {t('app.mode.problems')}
-        </button>
-        <button 
-          className={classNames('btn', 'btn--ghost', { active: mode === 'Admin' })}
-          role="tab"
-          aria-selected={mode === 'Admin'}
-          onClick={() => onModeToggle?.('Admin')}
-          title={t('app.mode.admin')}
-        >
-          {t('app.mode.admin')}
-        </button>
-      </nav>
-      
+
+      {/* Top-level navigation: Compiler, Problems, Admin - Hidden in Learn Mode */}
+      {mode !== 'Learn' && (
+        <nav className="header__nav" aria-label="Primary">
+          <button
+            className={classNames('btn', 'btn--ghost', { active: mode === 'Compiler' })}
+            role="tab"
+            aria-selected={mode === 'Compiler'}
+            onClick={() => onModeToggle?.('Compiler')}
+            title={t('app.mode.compiler')}
+          >
+            {t('app.mode.compiler')}
+          </button>
+          <button
+            className={classNames('btn', 'btn--ghost', { active: mode === 'Problems' })}
+            role="tab"
+            aria-selected={mode === 'Problems'}
+            onClick={() => onModeToggle?.('Problems')}
+            title={t('app.mode.problems')}
+          >
+            {t('app.mode.problems')}
+          </button>
+          <button
+            className={classNames('btn', 'btn--ghost', { active: mode === 'Admin' })}
+            role="tab"
+            aria-selected={mode === 'Admin'}
+            onClick={() => onModeToggle?.('Admin')}
+            title={t('app.mode.admin')}
+          >
+            {t('app.mode.admin')}
+          </button>
+        </nav>
+      )}
+
       {/* status and actions moved to left cluster */}
     </header>
   )

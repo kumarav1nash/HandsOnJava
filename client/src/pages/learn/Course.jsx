@@ -51,7 +51,7 @@ export default function Course({ courseId }) {
   const progress = Math.round(((index + 1) / modules.length) * 100)
 
   return (
-    <div className="course" role="region" aria-label="Course" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="course" role="region" aria-label="Course" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div className="course__topbar" style={{
         display: 'flex',
         alignItems: 'center',
@@ -68,12 +68,11 @@ export default function Course({ courseId }) {
           </div>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
-          <button className="btn" onClick={onPrev} disabled={!hasPrev} title={t('learn.nav.prev')}>← {t('learn.nav.prev')}</button>
-          <button className="btn btn--primary" onClick={onNext} disabled={!hasNext} title={t('learn.nav.next')}>{t('learn.nav.next')} →</button>
+          {/* Navigation moved to footer */}
         </div>
       </div>
 
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div role="navigation" aria-label="Course modules" style={{
           display: 'flex',
           gap: '0.5rem',
@@ -105,11 +104,29 @@ export default function Course({ courseId }) {
           })}
         </div>
 
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          {module?.type === 'concept' && <Concept conceptId={module.id} />}
-          {module?.type === 'mcq' && <MCQ mcqId={module.id} onComplete={(s) => { if (s && s.correct === s.total) onNext() }} />}
+        <div style={{ flex: 1, position: 'relative' }}>
+          {module?.type === 'concept' && <Concept conceptId={module.id} hideNav={true} />}
+          {module?.type === 'mcq' && <MCQ mcqId={module.id} onComplete={() => onNext()} />}
           {module?.type === 'practice' && <Practice exerciseId={module.id} onComplete={() => onNext()} />}
         </div>
+      </div>
+
+      <div className="course__footer" style={{
+        padding: '1rem 1.5rem',
+        borderTop: '1px solid var(--border-color)',
+        background: 'var(--bg-secondary)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'sticky',
+        bottom: 0,
+        zIndex: 10
+      }}>
+        <button className="btn" onClick={onPrev} disabled={!hasPrev} title={t('learn.nav.prev')}>← {t('learn.nav.prev')}</button>
+        <div className="muted" style={{ fontSize: '0.9rem' }}>
+          {index + 1} / {modules.length}
+        </div>
+        <button className="btn btn--primary" onClick={onNext} disabled={!hasNext} title={t('learn.nav.next')}>{t('learn.nav.next')} →</button>
       </div>
     </div>
   )

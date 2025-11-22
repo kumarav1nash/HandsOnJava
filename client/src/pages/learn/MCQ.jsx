@@ -24,15 +24,15 @@ export default function MCQ({ mcqId, onComplete }) {
 
   const onCheck = () => {
     setChecked(true)
-    if (onComplete) onComplete(score())
+    // if (onComplete) onComplete(score()) // Removed auto-advance
   }
   const onReset = () => { setAnswers({}); setChecked(false) }
 
   const { correct, total } = score()
 
   return (
-    <section className="pane" role="region" aria-label="MCQ" style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <header className="pane__header" style={{ marginBottom: '2rem', borderBottom: '1px solid var(--border-color, #333)', paddingBottom: '1rem' }}>
+    <section className="pane" role="region" aria-label="MCQ" style={{ padding: '2rem', maxWidth: 'var(--content-width, 800px)', margin: '0 auto' }}>
+      <header className="pane__header" style={{ marginBottom: '2rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
         <h3 className="pane__title" style={{ fontSize: '1.5rem', margin: 0 }}>{mcq.title}</h3>
         <div className="toolbar" style={{ marginLeft: 'auto' }}>
           <button className="btn btn--primary" onClick={onCheck} disabled={checked || Object.keys(answers).length < mcq.questions.length}>Check Answers</button>
@@ -49,9 +49,9 @@ export default function MCQ({ mcqId, onComplete }) {
             <div key={qi} className="mcq-card" style={{
               marginBottom: '2rem',
               padding: '1.5rem',
-              background: 'var(--bg-secondary, #1e1e1e)',
+              background: 'var(--bg-secondary)',
               borderRadius: '8px',
-              border: `1px solid ${checked ? (isCorrect ? 'var(--success-color, #4caf50)' : 'var(--error-color, #f44336)') : 'var(--border-color, #333)'}`,
+              border: `1px solid ${checked ? (isCorrect ? 'var(--success-color)' : 'var(--error-color)') : 'var(--border-color)'}`,
               transition: 'border-color 0.3s'
             }}>
               <h4 style={{ marginTop: 0, fontSize: '1.1rem', marginBottom: '1rem' }}>{qi + 1}. {q.prompt}</h4>
@@ -68,7 +68,7 @@ export default function MCQ({ mcqId, onComplete }) {
                       padding: '0.75rem',
                       borderRadius: '6px',
                       background: isSelected ? 'rgba(100, 108, 255, 0.1)' : 'transparent',
-                      border: `1px solid ${isSelected ? 'var(--primary-color, #646cff)' : 'var(--border-color, #444)'}`,
+                      border: `1px solid ${isSelected ? 'var(--primary-color)' : 'var(--border-color)'}`,
                       cursor: checked ? 'default' : 'pointer'
                     }}>
                       <input
@@ -80,8 +80,8 @@ export default function MCQ({ mcqId, onComplete }) {
                         style={{ marginRight: '0.75rem' }}
                       />
                       <span style={{ flex: 1 }}>{opt.text}</span>
-                      {showCorrect && <span style={{ color: 'var(--success-color, #4caf50)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✓ Correct</span>}
-                      {showWrong && <span style={{ color: 'var(--error-color, #f44336)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✗ Your Answer</span>}
+                      {showCorrect && <span style={{ color: 'var(--success-color)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✓ Correct</span>}
+                      {showWrong && <span style={{ color: 'var(--error-color)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✗ Your Answer</span>}
                     </label>
                   )
                 })}
@@ -99,10 +99,17 @@ export default function MCQ({ mcqId, onComplete }) {
       {checked && (
         <div className="panel__footer" style={{ marginTop: '2rem', textAlign: 'center' }}>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-            Score: <span style={{ color: correct === total ? 'var(--success-color, #4caf50)' : 'var(--text-primary)' }}>{correct}/{total}</span>
+            Score: <span style={{ color: correct === total ? 'var(--success-color)' : 'var(--text-primary)' }}>{correct}/{total}</span>
           </div>
           {correct === total ? (
-            <p style={{ color: 'var(--success-color, #4caf50)' }}>Perfect score! Proceed to the next module.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+              <p style={{ color: 'var(--success-color)', margin: 0 }}>Perfect score!</p>
+              {onComplete && (
+                <button className="btn btn--primary btn--lg" onClick={() => onComplete(score())}>
+                  Next Module →
+                </button>
+              )}
+            </div>
           ) : (
             <p className="muted">Review the explanations and try again.</p>
           )}
