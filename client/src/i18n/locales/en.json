@@ -31,5 +31,10 @@
   "learn.verify.fail": "Verification failed",
   "learn.reset": "Reset",
   "learn.search.placeholder": "Search concepts",
-  "learn.tags.aria": "Concept Tags"
+  "learn.tags.aria": "Concept Tags",
+  "learn.tab.overview": "Overview",
+  "learn.tab.practice": "Practice"
+  ,
+  "learn.nav.prev": "Prev",
+  "learn.nav.next": "Next"
 }

@@ -9,6 +9,8 @@ import AdminPanel from './components/AdminPanel'
 import ProblemsCatalog from './pages/ProblemsCatalog.jsx'
 import Learn from './pages/Learn.jsx'
 import LearnConcept from './pages/learn/Concept.jsx'
+import LearnCourses from './pages/learn/Courses.jsx'
+import LearnCourse from './pages/learn/Course.jsx'
 import Header from './components/Header'
 import OutputPane from './components/OutputPane'
 import { runJava } from './services/compilerClient'
@@ -259,6 +261,7 @@ function App() {
   const [problemNav, setProblemNav] = useState(null)
   return (
     <div className="app" role="application" aria-label={t('header.title')}>
+      {!location.pathname.startsWith('/learn/course') && (
       <Header 
         onThemeToggle={onThemeToggle} 
         theme={theme}
@@ -268,7 +271,7 @@ function App() {
         mode={activeMode}
         onModeToggle={onNavMode}
         problemNav={problemNav}
-      />
+      />)}
       
       <main className="app__main" role="main">
         {/* Mode navigation moved to Header */}
@@ -282,11 +285,15 @@ function App() {
         ) : location.pathname.startsWith('/learn') ? (
           (() => {
             const parts = location.pathname.split('/').filter(Boolean)
-            if (parts.length > 1) {
+            if (parts[1] === 'course' && parts.length > 2) {
+              const courseId = parts[2]
+              return <LearnCourse courseId={courseId} />
+            }
+            if (parts.length > 1 && parts[1] !== 'course') {
               const conceptId = parts[1]
               return <LearnConcept conceptId={conceptId} />
             }
-            return <Learn />
+            return <LearnCourses />
           })()
         ) : activeMode === 'Compiler' ? (
           <SplitPane 

@@ -11,6 +11,7 @@ import Notifications from '../admin/pages/Notifications'
 import Settings from '../admin/pages/Settings'
 import Import from '../admin/pages/Import'
 import LLMPlayground from '../admin/pages/LLMPlayground'
+import CoursesAdmin from '../admin/pages/CoursesAdmin'
 
 function AdminLayoutShell() {
   const navigate = useNavigate()
@@ -52,6 +53,7 @@ function AdminLayoutShell() {
             <div className="admin-nav__section-title">Management</div>
             <NavLink to="/admin/users" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Users</NavLink>
             <NavLink to="/admin/content" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Content</NavLink>
+            <NavLink to="/admin/courses" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Courses</NavLink>
             <NavLink to="/admin/import" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Import</NavLink>
             <NavLink to="/admin/playground" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>LLM Playground</NavLink>
           </div>
@@ -81,6 +83,7 @@ export default function AdminPanel() {
           <Route index element={<Overview />} />
         <Route path="users" element={<Users />} />
         <Route path="content" element={<Content />} />
+        <Route path="courses" element={<CoursesAdmin />} />
         <Route path="import" element={<Import />} />
         <Route path="playground" element={<LLMPlayground />} />
         <Route path="analytics" element={<Analytics />} />

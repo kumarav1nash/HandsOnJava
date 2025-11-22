@@ -1,7 +1,7 @@
 import { memo, forwardRef } from 'react'
 import Editor from '@monaco-editor/react'
 
-const EditorPane = memo(forwardRef(({ value, onChange, language = 'java', theme = 'vs-dark', height = '100%', onRun, onSubmit }, ref) => {
+const EditorPane = memo(forwardRef(({ value, onChange, language = 'java', theme = 'vs-dark', height = '100%', onRun, onSubmit, readOnly = false }, ref) => {
   return (
     <div className="editor" style={{ height: '100%' }}>
       <Editor
@@ -24,7 +24,7 @@ const EditorPane = memo(forwardRef(({ value, onChange, language = 'java', theme 
           }
         }}
         options={{
-          readOnly: false,
+          readOnly,
           fontSize: 14,
           fontLigatures: true,
           minimap: { enabled: false },

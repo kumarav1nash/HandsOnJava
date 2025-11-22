@@ -31,5 +31,9 @@
   "learn.verify.fail": "सत्यापन विफल",
   "learn.reset": "रीसेट",
   "learn.search.placeholder": "कॉन्सेप्ट्स खोजें",
-  "learn.tags.aria": "कॉन्सेप्ट टैग्स"
+  "learn.tags.aria": "कॉन्सेप्ट टैग्स",
+  "learn.tab.overview": "ओवरव्यू",
+  "learn.tab.practice": "प्रैक्टिस",
+  "learn.nav.prev": "पिछला",
+  "learn.nav.next": "अगला"
 }
