@@ -1,0 +1,211 @@
+/* Form Component Styles */
+.ds-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-lg);
+}
+
+.ds-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-xs);
+}
+
+.ds-form-label {
+  font-size: var(--ds-font-size-sm);
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-color-text-primary);
+  margin-bottom: var(--ds-spacing-xs);
+}
+
+.ds-form-input {
+  width: 100%;
+  padding: var(--ds-spacing-sm) var(--ds-spacing-md);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-border-radius-md);
+  background-color: var(--ds-color-surface);
+  color: var(--ds-color-text-primary);
+  font-size: var(--ds-font-size-base);
+  line-height: var(--ds-line-height-base);
+  transition: all var(--ds-duration-fast) var(--ds-easing-base);
+}
+
+.ds-form-input:focus {
+  outline: none;
+  border-color: var(--ds-color-primary);
+  box-shadow: 0 0 0 3px var(--ds-color-primary-alpha);
+}
+
+.ds-form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--ds-color-surface-subtle);
+}
+
+.ds-form-input::placeholder {
+  color: var(--ds-color-text-muted);
+}
+
+.ds-form-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.ds-form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.ds-form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-sm);
+  cursor: pointer;
+}
+
+.ds-form-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-border-radius-sm);
+  accent-color: var(--ds-color-primary);
+}
+
+.ds-form-radio {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-sm);
+  cursor: pointer;
+}
+
+.ds-form-radio input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--ds-color-primary);
+}
+
+.ds-form-help {
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-text-muted);
+  margin-top: var(--ds-spacing-xs);
+}
+
+.ds-form-error {
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-danger);
+  margin-top: var(--ds-spacing-xs);
+}
+
+.ds-form-success {
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-success);
+  margin-top: var(--ds-spacing-xs);
+}
+
+/* Form validation states */
+.ds-form-input.is-invalid {
+  border-color: var(--ds-color-danger);
+}
+
+.ds-form-input.is-invalid:focus {
+  box-shadow: 0 0 0 3px var(--ds-color-danger-alpha);
+}
+
+.ds-form-input.is-valid {
+  border-color: var(--ds-color-success);
+}
+
+.ds-form-input.is-valid:focus {
+  box-shadow: 0 0 0 3px var(--ds-color-success-alpha);
+}
+
+/* Form layout utilities */
+.ds-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--ds-spacing-md);
+}
+
+.ds-form-actions {
+  display: flex;
+  gap: var(--ds-spacing-sm);
+  justify-content: flex-end;
+  margin-top: var(--ds-spacing-lg);
+}
+
+.ds-form-actions--start {
+  justify-content: flex-start;
+}
+
+.ds-form-actions--center {
+  justify-content: center;
+}
+
+.ds-form-actions--between {
+  justify-content: space-between;
+}
+
+/* Fieldset and legend */
+.ds-fieldset {
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-border-radius-md);
+  padding: var(--ds-spacing-lg);
+  margin: 0;
+}
+
+.ds-legend {
+  font-size: var(--ds-font-size-base);
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-color-text-primary);
+  padding: 0 var(--ds-spacing-sm);
+}
+
+/* Switch/Toggle */
+.ds-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.ds-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ds-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ds-color-surface-muted);
+  transition: var(--ds-duration-fast);
+  border-radius: 24px;
+}
+
+.ds-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: var(--ds-duration-fast);
+  border-radius: 50%;
+}
+
+input:checked + .ds-switch-slider {
+  background-color: var(--ds-color-primary);
+}
+
+input:checked + .ds-switch-slider:before {
+  transform: translateX(20px);
+}

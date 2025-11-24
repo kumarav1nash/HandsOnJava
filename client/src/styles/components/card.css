@@ -1,0 +1,224 @@
+/* =======================================================================
+ * Card Component Styles
+ * Reusable card layouts and variants
+ * ======================================================================= */
+
+/* -----------------------------------------------------------------------
+ * Base Card
+ * ----------------------------------------------------------------------- */
+.ds-card {
+  background: var(--ds-color-surface-elevated);
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-lg);
+  padding: var(--ds-space-lg);
+  box-shadow: var(--ds-shadow-sm);
+  transition: all var(--ds-transition-fast);
+}
+
+.ds-card:hover {
+  box-shadow: var(--ds-shadow-md);
+}
+
+/* -----------------------------------------------------------------------
+ * Card Variants
+ * ----------------------------------------------------------------------- */
+.ds-card--elevated {
+  box-shadow: var(--ds-shadow-md);
+}
+
+.ds-card--elevated:hover {
+  box-shadow: var(--ds-shadow-lg);
+}
+
+.ds-card--outlined {
+  background: transparent;
+  border: 2px solid var(--ds-color-border);
+}
+
+.ds-card--ghost {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* -----------------------------------------------------------------------
+ * Card Sizes
+ * ----------------------------------------------------------------------- */
+.ds-card--sm {
+  padding: var(--ds-space-md);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-card--lg {
+  padding: var(--ds-space-xl);
+  border-radius: var(--ds-radius-xl);
+}
+
+/* -----------------------------------------------------------------------
+ * Card Header
+ * ----------------------------------------------------------------------- */
+.ds-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--ds-space-md);
+}
+
+.ds-card__header:last-child {
+  margin-bottom: 0;
+}
+
+.ds-card__title {
+  font-size: var(--ds-font-size-lg);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-color-text-primary);
+  margin: 0;
+}
+
+.ds-card__subtitle {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-secondary);
+  margin-top: var(--ds-space-xs);
+}
+
+.ds-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-sm);
+  margin-left: var(--ds-space-md);
+}
+
+/* -----------------------------------------------------------------------
+ * Card Body
+ * ----------------------------------------------------------------------- */
+.ds-card__body {
+  color: var(--ds-color-text-secondary);
+  line-height: var(--ds-line-height-normal);
+}
+
+/* -----------------------------------------------------------------------
+ * Card Footer
+ * ----------------------------------------------------------------------- */
+.ds-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--ds-space-md);
+  padding-top: var(--ds-space-md);
+  border-top: 1px solid var(--ds-color-border);
+}
+
+.ds-card__footer:last-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* -----------------------------------------------------------------------
+ * Card Media
+ * ----------------------------------------------------------------------- */
+.ds-card__media {
+  margin: calc(-1 * var(--ds-space-lg)) calc(-1 * var(--ds-space-lg)) var(--ds-space-lg);
+  border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
+  overflow: hidden;
+}
+
+.ds-card__media:first-child {
+  margin-top: calc(-1 * var(--ds-space-lg));
+}
+
+.ds-card--sm .ds-card__media {
+  margin: calc(-1 * var(--ds-space-md)) calc(-1 * var(--ds-space-md)) var(--ds-space-md);
+  border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+}
+
+.ds-card--lg .ds-card__media {
+  margin: calc(-1 * var(--ds-space-xl)) calc(-1 * var(--ds-space-xl)) var(--ds-space-xl);
+  border-radius: var(--ds-radius-xl) var(--ds-radius-xl) 0 0;
+}
+
+/* -----------------------------------------------------------------------
+ * Card Grid
+ * ----------------------------------------------------------------------- */
+.ds-card-grid {
+  display: grid;
+  gap: var(--ds-space-lg);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.ds-card-grid--sm {
+  gap: var(--ds-space-md);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.ds-card-grid--lg {
+  gap: var(--ds-space-xl);
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+}
+
+/* -----------------------------------------------------------------------
+ * Interactive Cards
+ * ----------------------------------------------------------------------- */
+.ds-card--interactive {
+  cursor: pointer;
+  transition: all var(--ds-transition-normal);
+}
+
+.ds-card--interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ds-shadow-lg);
+  border-color: var(--ds-color-border-light);
+}
+
+.ds-card--interactive:active {
+  transform: translateY(0);
+  box-shadow: var(--ds-shadow-md);
+}
+
+/* -----------------------------------------------------------------------
+ * Card Status Indicators
+ * ----------------------------------------------------------------------- */
+.ds-card--success {
+  border-color: var(--ds-color-success);
+  box-shadow: 0 0 0 1px var(--ds-color-success);
+}
+
+.ds-card--warning {
+  border-color: var(--ds-color-warning);
+  box-shadow: 0 0 0 1px var(--ds-color-warning);
+}
+
+.ds-card--error {
+  border-color: var(--ds-color-error);
+  box-shadow: 0 0 0 1px var(--ds-color-error);
+}
+
+/* -----------------------------------------------------------------------
+ * Progress Card
+ * ----------------------------------------------------------------------- */
+.ds-card__progress {
+  margin-bottom: var(--ds-space-md);
+}
+
+.ds-card__progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--ds-color-border);
+  border-radius: var(--ds-radius-full);
+  overflow: hidden;
+}
+
+.ds-card__progress-fill {
+  height: 100%;
+  background: var(--ds-color-primary);
+  transition: width var(--ds-transition-normal);
+}
+
+.ds-card__progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--ds-space-xs);
+  font-size: var(--ds-font-size-xs);
+  color: var(--ds-color-text-muted);
+}

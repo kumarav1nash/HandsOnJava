@@ -107,18 +107,18 @@ export default function Practice({ exerciseId, onComplete }) {
             <EditorPane ref={editorRef} value={code} onChange={setCode} language="java" theme="vs-dark" height="100%" />
           </div>
 
-          <div className="practice-tabs" style={{ height: '30%', minHeight: '150px', display: 'flex', flexDirection: 'column', borderTop: '1px solid var(--border-color)' }}>
-            <div className="tabs-header" style={{ display: 'flex', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)' }}>
+          <div className="practice-tabs" style={{ height: '30%', minHeight: '150px', display: 'flex', flexDirection: 'column', borderTop: '1px solid var(--color-border, #2d3748)' }}>
+            <div className="tabs-header" style={{ display: 'flex', background: 'var(--color-surface, #1a1a2e)', borderBottom: '1px solid var(--color-border, #2d3748)' }}>
               <button
                 className={`tab-btn ${activeTab === 'input' ? 'active' : ''}`}
                 onClick={() => setActiveTab('input')}
                 style={{
                   padding: '0.5rem 1rem',
-                  background: activeTab === 'input' ? 'var(--bg-primary)' : 'transparent',
+                  background: activeTab === 'input' ? 'var(--color-background, #0f0f23)' : 'transparent',
                   border: 'none',
-                  borderRight: '1px solid var(--border-color)',
-                  borderBottom: activeTab === 'input' ? '2px solid var(--primary-color)' : 'none',
-                  color: activeTab === 'input' ? 'var(--text-primary)' : 'var(--text-muted)',
+                  borderRight: '1px solid var(--color-border, #2d3748)',
+                  borderBottom: activeTab === 'input' ? '2px solid var(--color-primary, #3b82f6)' : 'none',
+                  color: activeTab === 'input' ? 'var(--color-text-primary, #f7fafc)' : 'var(--color-text-muted, #a0aec0)',
                   cursor: 'pointer'
                 }}
               >
@@ -129,11 +129,11 @@ export default function Practice({ exerciseId, onComplete }) {
                 onClick={() => setActiveTab('output')}
                 style={{
                   padding: '0.5rem 1rem',
-                  background: activeTab === 'output' ? 'var(--bg-primary)' : 'transparent',
+                  background: activeTab === 'output' ? 'var(--color-background, #0f0f23)' : 'transparent',
                   border: 'none',
-                  borderRight: '1px solid var(--border-color)',
-                  borderBottom: activeTab === 'output' ? '2px solid var(--primary-color)' : 'none',
-                  color: activeTab === 'output' ? 'var(--text-primary)' : 'var(--text-muted)',
+                  borderRight: '1px solid var(--color-border, #2d3748)',
+                  borderBottom: activeTab === 'output' ? '2px solid var(--color-primary, #3b82f6)' : 'none',
+                  color: activeTab === 'output' ? 'var(--color-text-primary, #f7fafc)' : 'var(--color-text-muted, #a0aec0)',
                   cursor: 'pointer'
                 }}
               >
@@ -141,7 +141,7 @@ export default function Practice({ exerciseId, onComplete }) {
               </button>
             </div>
 
-            <div className="tab-content" style={{ flex: 1, overflow: 'hidden', background: 'var(--bg-primary)' }}>
+            <div className="tab-content" style={{ flex: 1, overflow: 'hidden', background: 'var(--color-background, #0f0f23)' }}>
               {activeTab === 'input' ? (
                 <div style={{ padding: '0.75rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <label className="label" htmlFor="stdin-input" style={{ marginBottom: '0.5rem', display: 'block', fontSize: '0.85rem' }}>Program Input (stdin)</label>

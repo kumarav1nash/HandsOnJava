@@ -67,8 +67,8 @@ export default function MCQ({ mcqId, onComplete }) {
                       alignItems: 'center',
                       padding: '0.75rem',
                       borderRadius: '6px',
-                      background: isSelected ? 'rgba(100, 108, 255, 0.1)' : 'transparent',
-                      border: `1px solid ${isSelected ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                      background: isSelected ? 'var(--color-info-bg, #1a202c)' : 'transparent',
+                      border: `1px solid ${isSelected ? 'var(--color-primary, #3b82f6)' : 'var(--color-border, #2d3748)'}`,
                       cursor: checked ? 'default' : 'pointer'
                     }}>
                       <input
@@ -80,8 +80,8 @@ export default function MCQ({ mcqId, onComplete }) {
                         style={{ marginRight: '0.75rem' }}
                       />
                       <span style={{ flex: 1 }}>{opt.text}</span>
-                      {showCorrect && <span style={{ color: 'var(--success-color)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✓ Correct</span>}
-                      {showWrong && <span style={{ color: 'var(--error-color)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✗ Your Answer</span>}
+                      {showCorrect && <span style={{ color: 'var(--color-success, #48bb78)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✓ Correct</span>}
+                      {showWrong && <span style={{ color: 'var(--color-error, #f56565)', fontWeight: 'bold', marginLeft: '0.5rem' }}>✗ Your Answer</span>}
                     </label>
                   )
                 })}
