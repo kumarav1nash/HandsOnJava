@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Regression Test - Learn Section</title>
+    <link rel="stylesheet" href="./enhanced-tokens.css">
+    <link rel="stylesheet" href="./animations.css">
+    <link rel="stylesheet" href="./learn-enhancements.css">
+    <style>
+        body {
+            font-family: var(--ds-font-family-base);
+            background: var(--ds-color-background);
+            color: var(--ds-color-text-primary);
+            margin: 0;
+            padding: var(--ds-spacing-6);
+        }
+
+        .test-section {
+            margin-bottom: var(--ds-spacing-8);
+            padding: var(--ds-spacing-6);
+            background: var(--ds-color-surface);
+            border-radius: var(--ds-radius-lg);
+            box-shadow: var(--ds-shadow-sm);
+        }
+
+        .test-header {
+            font-size: var(--ds-font-size-2xl);
+            font-weight: var(--ds-font-weight-bold);
+            margin-bottom: var(--ds-spacing-4);
+            color: var(--ds-color-text-primary);
+        }
+
+        .test-grid {
+            display: grid;
+            gap: var(--ds-spacing-4);
+            margin-bottom: var(--ds-spacing-6);
+        }
+
+        .test-card {
+            background: var(--ds-color-surface-elevated);
+            border: 1px solid var(--ds-color-border);
+            border-radius: var(--ds-radius-md);
+            padding: var(--ds-spacing-4);
+            transition: all var(--ds-duration-normal) var(--ds-easing-base);
+        }
+
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--ds-shadow-md);
+        }
+
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--ds-radius-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: var(--ds-spacing-2);
+            font-size: var(--ds-font-size-xs);
+            font-weight: var(--ds-font-weight-medium);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .typography-test {
+            margin-bottom: var(--ds-spacing-3);
+        }
+
+        .breakpoint-indicator {
+            position: fixed;
+            top: var(--ds-spacing-4);
+            right: var(--ds-spacing-4);
+            background: var(--ds-color-brand-primary);
+            color: white;
+            padding: var(--ds-spacing-2) var(--ds-spacing-3);
+            border-radius: var(--ds-radius-sm);
+            font-size: var(--ds-font-size-sm);
+            font-weight: var(--ds-font-weight-medium);
+            z-index: 1000;
+        }
+
+        @media (max-width: 640px) {
+            .breakpoint-indicator::after { content: 'Mobile (<640px)'; }
+        }
+        @media (min-width: 641px) and (max-width: 768px) {
+            .breakpoint-indicator::after { content: 'Tablet (641-768px)'; }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .breakpoint-indicator::after { content: 'Small Desktop (769-1024px)'; }
+        }
+        @media (min-width: 1025px) {
+            .breakpoint-indicator::after { content: 'Large Desktop (>1024px)'; }
+        }
+
+        .contrast-test {
+            padding: var(--ds-spacing-4);
+            margin: var(--ds-spacing-2) 0;
+            border-radius: var(--ds-radius-sm);
+        }
+
+        .animation-demo {
+            display: inline-block;
+            padding: var(--ds-spacing-3) var(--ds-spacing-4);
+            margin: var(--ds-spacing-2);
+            background: var(--ds-color-brand-primary);
+            color: white;
+            border-radius: var(--ds-radius-md);
+            cursor: pointer;
+            transition: all var(--ds-duration-normal) var(--ds-easing-base);
+        }
+
+        .animation-demo:hover {
+            transform: scale(1.05);
+        }
+
+        .progress-demo {
+            width: 100%;
+            height: 8px;
+            background: var(--ds-color-surface-subtle);
+            border-radius: var(--ds-radius-full);
+            overflow: hidden;
+            margin: var(--ds-spacing-3) 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--ds-color-brand-primary), var(--ds-color-brand-secondary));
+            border-radius: var(--ds-radius-full);
+            animation: progress-shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .accessibility-test {
+            border: 2px solid transparent;
+            padding: var(--ds-spacing-3);
+            margin: var(--ds-spacing-2) 0;
+            border-radius: var(--ds-radius-sm);
+        }
+
+        .accessibility-test:focus {
+            outline: 2px solid var(--ds-color-focus);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animation-demo {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        @media (prefers-high-contrast: high) {
+            .test-card {
+                border-width: 2px;
+                border-color: currentColor;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="breakpoint-indicator"></div>
+    
+    <div class="test-section">
+        <h1 class="test-header">Visual Regression Test Suite</h1>
+        <p>This page tests all enhanced styling components for the Learn section. Use this to verify visual consistency across browsers and devices.</p>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">Color System</h2>
+        <div class="test-grid" style="grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));">
+            <div class="color-swatch" style="background: var(--ds-color-brand-primary);">Primary</div>
+            <div class="color-swatch" style="background: var(--ds-color-brand-secondary);">Secondary</div>
+            <div class="color-swatch" style="background: var(--ds-color-brand-accent);">Accent</div>
+            <div class="color-swatch" style="background: var(--ds-color-success);">Success</div>
+            <div class="color-swatch" style="background: var(--ds-color-warning);">Warning</div>
+            <div class="color-swatch" style="background: var(--ds-color-error);">Error</div>
+            <div class="color-swatch" style="background: var(--ds-color-text-primary); color: var(--ds-color-background);">Text</div>
+            <div class="color-swatch" style="background: var(--ds-color-text-secondary); color: var(--ds-color-background);">Text 2</div>
+            <div class="color-swatch" style="background: var(--ds-color-background); color: var(--ds-color-text-primary);">Background</div>
+            <div class="color-swatch" style="background: var(--ds-color-surface); color: var(--ds-color-text-primary);">Surface</div>
+            <div class="color-swatch" style="background: var(--ds-color-surface-elevated); color: var(--ds-color-text-primary);">Elevated</div>
+            <div class="color-swatch" style="background: var(--ds-color-border); color: var(--ds-color-text-primary);">Border</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">Typography System</h2>
+        <div class="typography-test" style="font-size: var(--ds-font-size-xs);">Extra Small Text (xs)</div>
+        <div class="typography-test" style="font-size: var(--ds-font-size-sm);">Small Text (sm)</div>
+        <div class="typography-test" style="font-size: var(--ds-font-size-base);">Base Text (base)</div>
+        <div class="typography-test" style="font-size: var(--ds-font-size-lg);">Large Text (lg)</div>
+        <div class="typography-test" style="font-size: var(--ds-font-size-xl);">Extra Large Text (xl)</div>
+        <div class="typography-test" style="font-size: var(--ds-font-size-2xl);">2XL Text</div>
+        <div class="typography-test" style="font-size: var(--ds-font-size-3xl);">3XL Text</div>
+        <div class="typography-test" style="font-size: var(--ds-font-size-4xl);">4XL Text</div>
+        
+        <div style="margin-top: var(--ds-spacing-4);">
+            <div style="font-weight: var(--ds-font-weight-normal);">Normal Weight</div>
+            <div style="font-weight: var(--ds-font-weight-medium);">Medium Weight</div>
+            <div style="font-weight: var(--ds-font-weight-semibold);">Semibold Weight</div>
+            <div style="font-weight: var(--ds-font-weight-bold);">Bold Weight</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">WCAG Contrast Tests</h2>
+        <div class="contrast-test" style="background: var(--ds-color-background); color: var(--ds-color-text-primary);">
+            Background vs Text Primary - Should meet WCAG AA (4.5:1)
+        </div>
+        <div class="contrast-test" style="background: var(--ds-color-surface); color: var(--ds-color-text-secondary);">
+            Surface vs Text Secondary - Should meet WCAG AA (4.5:1)
+        </div>
+        <div class="contrast-test" style="background: var(--ds-color-brand-primary); color: white;">
+            Primary Brand vs White - Should meet WCAG AA (4.5:1)
+        </div>
+        <div class="contrast-test" style="background: var(--ds-color-success); color: white;">
+            Success vs White - Should meet WCAG AA (4.5:1)
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">Animation System</h2>
+        <div class="animation-demo ds-animate-fade-in">Fade In Animation</div>
+        <div class="animation-demo ds-animate-slide-in-up">Slide In Up</div>
+        <div class="animation-demo ds-animate-slide-in-right">Slide In Right</div>
+        <div class="animation-demo ds-animate-scale-in">Scale In</div>
+        
+        <div class="progress-demo">
+            <div class="progress-bar"></div>
+        </div>
+        
+        <p style="margin-top: var(--ds-spacing-4); font-size: var(--ds-font-size-sm); color: var(--ds-color-text-secondary);">
+            Note: Animations respect <code>prefers-reduced-motion</code> setting
+        </p>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">Component Tests</h2>
+        <div class="test-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            <div class="test-card ds-card ds-card--elevated">
+                <h3>Course Card</h3>
+                <p>Enhanced course card with hover effects and animations.</p>
+                <div class="progress-demo" style="margin-top: var(--ds-spacing-3);">
+                    <div class="progress-bar" style="width: 65%;"></div>
+                </div>
+            </div>
+            
+            <div class="test-card ds-card ds-card--interactive">
+                <h3>Interactive Card</h3>
+                <p>Interactive card with enhanced hover states.</p>
+                <button class="animation-demo" style="margin-top: var(--ds-spacing-3);">Action Button</button>
+            </div>
+            
+            <div class="test-card ds-card">
+                <h3>Navigation Chip</h3>
+                <p>Enhanced navigation chip styling.</p>
+                <div style="display: flex; gap: var(--ds-spacing-2); margin-top: var(--ds-spacing-3);">
+                    <span class="animation-demo" style="padding: var(--ds-spacing-2) var(--ds-spacing-3); font-size: var(--ds-font-size-sm);">Active</span>
+                    <span class="animation-demo" style="padding: var(--ds-spacing-2) var(--ds-spacing-3); font-size: var(--ds-font-size-sm); background: var(--ds-color-surface-subtle); color: var(--ds-color-text-secondary);">Inactive</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">Accessibility Tests</h2>
+        <div class="accessibility-test" tabindex="0">
+            Focusable element with enhanced focus styles
+        </div>
+        <button class="accessibility-test" style="background: var(--ds-color-brand-primary); color: white; border: none; cursor: pointer;">
+            Button with enhanced styling
+        </button>
+        <div style="margin-top: var(--ds-spacing-4); font-size: var(--ds-font-size-sm); color: var(--ds-color-text-secondary);">
+            <p>Test with:</p>
+            <ul>
+                <li>Keyboard navigation (Tab, Shift+Tab)</li>
+                <li>Screen reader</li>
+                <li>High contrast mode</li>
+                <li>Reduced motion preference</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">Responsive Tests</h2>
+        <div class="test-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+            <div class="test-card">
+                <h3>Mobile First</h3>
+                <p>Test on devices &lt; 640px width</p>
+            </div>
+            <div class="test-card">
+                <h3>Tablet</h3>
+                <p>Test on devices 641-768px width</p>
+            </div>
+            <div class="test-card">
+                <h3>Small Desktop</h3>
+                <p>Test on devices 769-1024px width</p>
+            </div>
+            <div class="test-card">
+                <h3>Large Desktop</h3>
+                <p>Test on devices &gt; 1024px width</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-header">Test Instructions</h2>
+        <div style="font-size: var(--ds-font-size-sm); line-height: var(--ds-line-height-relaxed);">
+            <h3>Visual Regression Testing:</h3>
+            <ol>
+                <li>Open this page in different browsers (Chrome, Firefox, Safari, Edge)</li>
+                <li>Test on different devices (mobile, tablet, desktop)</li>
+                <li>Verify color consistency and contrast ratios</li>
+                <li>Check animation smoothness and performance</li>
+                <li>Test accessibility features</li>
+                <li>Verify responsive behavior at all breakpoints</li>
+            </ol>
+            
+            <h3>Automated Testing:</h3>
+            <p>Use tools like:</p>
+            <ul>
+                <li>Lighthouse for performance and accessibility</li>
+                <li>BackstopJS or Percy for visual regression</li>
+                <li>axe-core for accessibility testing</li>
+                <li>Browser DevTools for responsive design</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

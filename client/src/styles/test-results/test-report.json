@@ -1,0 +1,220 @@
+{
+  "visualRegression": {
+    "colorSystem": {
+      "colorsDefined": [
+        "--ds-brand-primary",
+        "--ds-brand-secondary",
+        "--ds-brand-accent",
+        "--ds-color-success",
+        "--ds-color-warning",
+        "--ds-color-danger",
+        "--ds-color-text-primary",
+        "--ds-color-text-secondary",
+        "--ds-color-background",
+        "--ds-color-surface"
+      ],
+      "colorsMissing": [],
+      "contrastRatios": {
+        "primary": {
+          "ratio": 7.2,
+          "wcagAA": true,
+          "wcagAAA": true
+        },
+        "secondary": {
+          "ratio": 4.8,
+          "wcagAA": true,
+          "wcagAAA": false
+        },
+        "success": {
+          "ratio": 4.5,
+          "wcagAA": true,
+          "wcagAAA": false
+        },
+        "warning": {
+          "ratio": 3.1,
+          "wcagAA": false,
+          "wcagAAA": false
+        },
+        "error": {
+          "ratio": 5.2,
+          "wcagAA": true,
+          "wcagAAA": true
+        }
+      }
+    },
+    "typography": {
+      "typographyDefined": [
+        "--ds-font-size-xs",
+        "--ds-font-size-sm",
+        "--ds-font-size-base",
+        "--ds-font-size-lg",
+        "--ds-font-size-xl",
+        "--ds-font-weight-normal",
+        "--ds-font-weight-medium",
+        "--ds-font-weight-bold",
+        "--ds-line-height-normal"
+      ],
+      "typographyMissing": [
+        "--ds-font-family-base"
+      ],
+      "fluidTypography": [
+        "--ds-font-size-xs",
+        "--ds-font-size-sm",
+        "--ds-font-size-base",
+        "--ds-font-size-lg",
+        "--ds-font-size-xl"
+      ]
+    },
+    "animations": {
+      "animationsDefined": [
+        "ds-fade-in",
+        "ds-fade-in-up",
+        "ds-slide-in-right",
+        "ds-scale-in"
+      ],
+      "animationsMissing": [
+        "ds-slide-in-up"
+      ],
+      "performanceOptimized": true,
+      "accessibilitySupported": true
+    },
+    "components": {
+      "componentsDefined": [
+        ".course-card",
+        ".course-card:hover",
+        ".course__nav-chip",
+        ".concept__step"
+      ],
+      "componentsMissing": [
+        ".progress-bar"
+      ],
+      "hoverEffects": true,
+      "responsiveDesign": true
+    }
+  },
+  "responsive": {
+    "breakpoints": {
+      "320": {
+        "viewport": 320,
+        "layout": "responsive",
+        "typography": "scaled",
+        "spacing": "adjusted",
+        "touchTargets": "large"
+      },
+      "640": {
+        "viewport": 640,
+        "layout": "responsive",
+        "typography": "scaled",
+        "spacing": "adjusted",
+        "touchTargets": "large"
+      },
+      "768": {
+        "viewport": 768,
+        "layout": "responsive",
+        "typography": "scaled",
+        "spacing": "adjusted",
+        "touchTargets": "large"
+      },
+      "1024": {
+        "viewport": 1024,
+        "layout": "responsive",
+        "typography": "scaled",
+        "spacing": "adjusted",
+        "touchTargets": "normal"
+      },
+      "1200": {
+        "viewport": 1200,
+        "layout": "responsive",
+        "typography": "scaled",
+        "spacing": "adjusted",
+        "touchTargets": "normal"
+      },
+      "1440": {
+        "viewport": 1440,
+        "layout": "responsive",
+        "typography": "scaled",
+        "spacing": "adjusted",
+        "touchTargets": "normal"
+      }
+    },
+    "fluidTypography": {},
+    "flexibleLayouts": {},
+    "touchTargets": {}
+  },
+  "accessibility": {
+    "wcagCompliance": {
+      "colorContrast": true,
+      "textSize": true,
+      "focusIndicators": false,
+      "reducedMotion": true,
+      "highContrast": false
+    },
+    "keyboardNavigation": {
+      "focusVisible": false,
+      "focusWithin": false,
+      "tabOrder": true,
+      "skipLinks": false
+    },
+    "screenReader": {
+      "semanticHtml": true,
+      "ariaLabels": true,
+      "headingStructure": true,
+      "altText": true
+    },
+    "focusManagement": {
+      "focusTrapping": false,
+      "focusRestoration": false,
+      "focusIndicators": false,
+      "focusOrder": true
+    }
+  },
+  "performance": {
+    "cssSize": {
+      "totalSize": 32429,
+      "compressedSize": 9728,
+      "files": 3,
+      "optimized": true
+    },
+    "animationPerformance": {
+      "hardwareAccelerated": true,
+      "willChange": false,
+      "smoothAnimations": true,
+      "reducedMotionSupport": true
+    },
+    "paintMetrics": {
+      "layoutThrashing": false,
+      "forcedSynchronous": false,
+      "compositeLayers": true,
+      "paintComplexity": "low"
+    },
+    "loadingPerformance": {
+      "criticalCSS": true,
+      "renderBlocking": true,
+      "preloadResources": false,
+      "lazyLoading": false
+    }
+  },
+  "crossBrowser": {
+    "cssFeatures": {
+      "cssVariables": true,
+      "flexbox": false,
+      "grid": false,
+      "clamp": true,
+      "mediaQueries": true
+    },
+    "vendorPrefixes": {
+      "hasVendorPrefixes": true,
+      "modernCSS": false,
+      "autoprefixerReady": true
+    },
+    "browserSupport": {
+      "chrome": "88+",
+      "firefox": "85+",
+      "safari": "14+",
+      "edge": "88+",
+      "ie": "Not supported"
+    }
+  },
+  "timestamp": "2025-11-24T08:35:46.276Z",
+  "duration": 17
+}

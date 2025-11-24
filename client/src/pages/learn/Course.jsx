@@ -52,10 +52,10 @@ export default function Course({ courseId }) {
   const progress = Math.round(((index + 1) / modules.length) * 100)
 
   return (
-    <div className={styles.course} role="region" aria-label="Course">
+    <div className={`${styles.course} ds-animate-fade-in`} role="region" aria-label="Course">
       <div className={styles.course__topbar}>
         <button 
-          className="ds-btn ds-btn--ghost ds-btn--sm" 
+          className="ds-btn ds-btn--ghost ds-btn--sm ds-hover-lift" 
           onClick={exit} 
           title="Exit"
         >
@@ -74,7 +74,7 @@ export default function Course({ courseId }) {
       </div>
 
       <div className={styles.course__content}>
-        <nav className={styles.course__navigation} role="navigation" aria-label="Course modules">
+        <nav className={`${styles.course__navigation} ds-animate-slide-in-right`} role="navigation" aria-label="Course modules">
           {modules.map((m, i) => {
             const label = m.type === 'concept' ? 'Concept' : m.type === 'mcq' ? 'MCQ' : 'Practice'
             const active = i === index
@@ -105,7 +105,7 @@ export default function Course({ courseId }) {
 
       <div className={styles.course__footer}>
         <button 
-          className="ds-btn ds-btn--secondary" 
+          className="ds-btn ds-btn--secondary ds-hover-lift" 
           onClick={onPrev} 
           disabled={!hasPrev} 
           title={t('learn.nav.prev')}
@@ -118,7 +118,7 @@ export default function Course({ courseId }) {
         </div>
         
         <button 
-          className="ds-btn ds-btn--primary" 
+          className="ds-btn ds-btn--primary ds-hover-lift" 
           onClick={onNext} 
           disabled={!hasNext} 
           title={t('learn.nav.next')}

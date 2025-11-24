@@ -1,0 +1,414 @@
+/* =======================================================================
+ * Enhanced Animations & Transitions for Learn Section
+ * Subtle, performant animations for better UX
+ * ======================================================================= */
+
+/* -----------------------------------------------------------------------
+ * Keyframe Animations
+ * ----------------------------------------------------------------------- */
+
+@keyframes ds-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ds-fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ds-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ds-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ds-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ds-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes ds-bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes ds-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes ds-glow {
+  0%, 100% {
+    box-shadow: 0 0 2px var(--ds-color-primary-alpha);
+  }
+  50% {
+    box-shadow: 0 0 8px var(--ds-color-primary-alpha), 0 0 16px var(--ds-color-primary-alpha-hover);
+  }
+}
+
+/* -----------------------------------------------------------------------
+ * Animation Utilities
+ * ----------------------------------------------------------------------- */
+
+.ds-animate-fade-in {
+  animation: ds-fade-in var(--ds-duration-normal) var(--ds-easing-base) both;
+}
+
+.ds-animate-fade-in-up {
+  animation: ds-fade-in-up var(--ds-duration-normal) var(--ds-easing-decelerate) both;
+}
+
+.ds-animate-fade-in-down {
+  animation: ds-fade-in-down var(--ds-duration-normal) var(--ds-easing-decelerate) both;
+}
+
+.ds-animate-scale-in {
+  animation: ds-scale-in var(--ds-duration-normal) var(--ds-easing-decelerate) both;
+}
+
+.ds-animate-slide-in-right {
+  animation: ds-slide-in-right var(--ds-duration-normal) var(--ds-easing-decelerate) both;
+}
+
+.ds-animate-slide-in-left {
+  animation: ds-slide-in-left var(--ds-duration-normal) var(--ds-easing-decelerate) both;
+}
+
+.ds-animate-pulse {
+  animation: ds-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.ds-animate-bounce {
+  animation: ds-bounce 1s var(--ds-easing-base) both;
+}
+
+.ds-animate-shake {
+  animation: ds-shake 0.5s var(--ds-easing-base) both;
+}
+
+.ds-animate-glow {
+  animation: ds-glow 2s var(--ds-easing-base) infinite;
+}
+
+/* -----------------------------------------------------------------------
+ * Staggered Animations
+ * ----------------------------------------------------------------------- */
+
+.ds-animate-stagger > * {
+  animation: ds-fade-in-up var(--ds-duration-normal) var(--ds-easing-decelerate) both;
+}
+
+.ds-animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.ds-animate-stagger > *:nth-child(2) { animation-delay: 100ms; }
+.ds-animate-stagger > *:nth-child(3) { animation-delay: 200ms; }
+.ds-animate-stagger > *:nth-child(4) { animation-delay: 300ms; }
+.ds-animate-stagger > *:nth-child(5) { animation-delay: 400ms; }
+.ds-animate-stagger > *:nth-child(6) { animation-delay: 500ms; }
+
+/* -----------------------------------------------------------------------
+ * Enhanced Interactive Element Animations
+ * ----------------------------------------------------------------------- */
+
+/* Enhanced Button Hover Effects */
+.ds-btn {
+  transition: all var(--ds-duration-fast) var(--ds-easing-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.ds-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ds-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.ds-btn:active {
+  transform: scale(0.98);
+  transition-duration: var(--ds-duration-instant);
+}
+
+/* Enhanced Card Animations */
+.ds-card {
+  transition: all var(--ds-duration-normal) var(--ds-easing-base);
+  transform: translateZ(0); /* Enable hardware acceleration */
+}
+
+.ds-card:hover {
+  transform: translateY(-4px) translateZ(0);
+  box-shadow: var(--ds-shadow-xl);
+}
+
+.ds-card--interactive {
+  cursor: pointer;
+  transition: all var(--ds-duration-normal) var(--ds-easing-base);
+}
+
+.ds-card--interactive:hover {
+  transform: translateY(-8px) scale(1.02) translateZ(0);
+  box-shadow: var(--ds-shadow-2xl);
+}
+
+/* Enhanced Progress Bar Animations */
+.ds-progress-fill {
+  transition: width var(--ds-duration-slow) var(--ds-easing-decelerate);
+  background: linear-gradient(90deg, var(--ds-color-primary) 0%, var(--ds-color-primary-light) 50%, var(--ds-color-primary) 100%);
+  background-size: 200% 100%;
+  animation: ds-progress-shimmer 2s linear infinite;
+}
+
+@keyframes ds-progress-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Enhanced Navigation Animations */
+.ds-nav-link {
+  position: relative;
+  transition: all var(--ds-duration-fast) var(--ds-easing-base);
+}
+
+.ds-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--ds-color-primary);
+  transition: all var(--ds-duration-fast) var(--ds-easing-base);
+  transform: translateX(-50%);
+}
+
+.ds-nav-link:hover::after,
+.ds-nav-link.is-active::after {
+  width: 100%;
+}
+
+/* Enhanced Tag Animations */
+.ds-tag {
+  transition: all var(--ds-duration-fast) var(--ds-easing-base);
+  transform: translateZ(0);
+}
+
+.ds-tag--interactive:hover {
+  transform: translateY(-2px) scale(1.05) translateZ(0);
+  box-shadow: var(--ds-shadow-md);
+}
+
+/* Enhanced Form Input Animations */
+.ds-form-input {
+  transition: all var(--ds-duration-fast) var(--ds-easing-base);
+}
+
+.ds-form-input:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--ds-color-primary-alpha);
+}
+
+/* Loading States */
+.ds-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.ds-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: ds-loading-shimmer 1.5s infinite;
+}
+
+@keyframes ds-loading-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* -----------------------------------------------------------------------
+ * Micro-interactions
+ * ----------------------------------------------------------------------- */
+
+/* Ripple Effect */
+.ds-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ds-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ds-ripple:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Hover Lift Effect */
+.ds-hover-lift {
+  transition: transform var(--ds-duration-fast) var(--ds-easing-base);
+}
+
+.ds-hover-lift:hover {
+  transform: translateY(-2px) translateZ(0);
+}
+
+/* Focus Ring Animation */
+.ds-focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--ds-duration-fast) var(--ds-easing-base);
+}
+
+.ds-focus-ring:focus {
+  outline-color: var(--ds-color-primary);
+  animation: ds-focus-pulse 2s var(--ds-easing-base) infinite;
+}
+
+@keyframes ds-focus-pulse {
+  0%, 100% {
+    outline-offset: 2px;
+  }
+  50% {
+    outline-offset: 4px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+ * Reduced Motion Support
+ * ----------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .ds-animate-fade-in,
+  .ds-animate-fade-in-up,
+  .ds-animate-fade-in-down,
+  .ds-animate-scale-in,
+  .ds-animate-slide-in-right,
+  .ds-animate-slide-in-left,
+  .ds-animate-pulse,
+  .ds-animate-bounce,
+  .ds-animate-shake,
+  .ds-animate-glow,
+  .ds-animate-stagger > * {
+    animation: none !important;
+  }
+  
+  .ds-btn,
+  .ds-card,
+  .ds-nav-link,
+  .ds-tag,
+  .ds-form-input,
+  .ds-hover-lift {
+    transition: none !important;
+  }
+  
+  .ds-btn::before,
+  .ds-loading::after,
+  .ds-ripple::before {
+    animation: none !important;
+  }
+  
+  .ds-progress-fill {
+    animation: none !important;
+  }
+}

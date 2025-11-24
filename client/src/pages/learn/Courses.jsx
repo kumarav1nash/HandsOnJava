@@ -28,32 +28,34 @@ export default function Courses() {
   const openCourse = (id) => navigate(`/learn/course/${id}`)
 
   return (
-    <div className={styles.courses} role="region" aria-label={t('learn.title')}>
-      <header className={styles.courses__header}>
-        <h1 className={styles.courses__title}>{t('learn.title')}</h1>
-        <p className={styles.courses__subtitle}>{t('learn.subtitle')}</p>
+    <div className={`${styles.courses} ds-animate-fade-in`} role="region" aria-label={t('learn.title')}>
+      <header className={`${styles.courses__header} ds-animate-fade-in-up`}>
+        <h1 className={`${styles.courses__title} ds-display--small`}>{t('learn.title')}</h1>
+        <p className={`${styles.courses__subtitle} ds-lead`}>{t('learn.subtitle')}</p>
       </header>
       
       <section className="ds-section" aria-label="Courses List">
         {coursesWithProgress.length === 0 ? (
-          <div className={styles.courses__empty}>
+          <div className={`${styles.courses__empty} empty-state ds-animate-scale-in`}>
+            <div className="empty-state__icon">📚</div>
             <h3 className={styles['courses__empty-title']}>No courses available</h3>
             <p className={styles['courses__empty-description']}>
               Check back later for new courses.
             </p>
           </div>
         ) : (
-          <div className={styles.courses__grid}>
-            {coursesWithProgress.map((c) => (
+          <div className={`${styles.courses__grid} ds-animate-stagger`}>
+            {coursesWithProgress.map((c, index) => (
               <div 
                 key={c.id} 
-                className={`${styles['course-card']} ds-card ds-card--elevated`}
+                className={`${styles['course-card']} ds-card ds-card--elevated ds-card--interactive`}
                 onClick={() => openCourse(c.id)}
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className={styles['course-card__header']}>
                   <h3 className={styles['course-card__title']}>{c.title}</h3>
                   <span 
-                    className={`ds-tag ds-tag--${c.level.toLowerCase()} ds-tag--sm`}
+                    className={`ds-tag ds-tag--${c.level.toLowerCase()} ds-tag--sm ds-tag--interactive`}
                     title={c.level}
                   >
                     {c.level}
@@ -84,7 +86,7 @@ export default function Courses() {
                   </div>
                 )}
                 
-                <button className="ds-btn ds-btn--primary ds-btn--lg ds-btn--block">
+                <button className="ds-btn ds-btn--primary ds-btn--lg ds-btn--block ds-hover-lift">
                   {c.started ? 'Continue Learning' : 'Start Learning'}
                 </button>
               </div>
