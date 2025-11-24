@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import LocaleSwitcher from './LocaleSwitcher'
 import { useI18n } from '../i18n/useI18n.js'
 import classNames from 'classnames'
@@ -6,6 +7,7 @@ import classNames from 'classnames'
 const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, mode, onModeToggle, problemNav }) => {
   const [saved, setSaved] = useState(false)
   const { t } = useI18n()
+  const location = useLocation()
 
   useEffect(() => {
     if (!hasUnsavedChanges && lastSaved) {
@@ -136,14 +138,18 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
       </div>
 
       <div className="header__brand">
-        <img
-          src="/vite.svg"
-          className="logo"
-          alt={t('header.brand_alt')}
-          role="img"
-        />
+        <Link to="/" className="header__logo-link" title="Go to Home">
+          <img
+            src="/vite.svg"
+            className="logo"
+            alt={t('header.brand_alt')}
+            role="img"
+          />
+        </Link>
         <h1 className="header__title">
-          {t('header.title')}
+          <Link to="/" className="header__title-link" title="Go to Home">
+            {t('header.title')}
+          </Link>
         </h1>
       </div>
 
@@ -154,7 +160,11 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
             className={classNames('btn', 'btn--ghost', { active: mode === 'Compiler' })}
             role="tab"
             aria-selected={mode === 'Compiler'}
-            onClick={() => onModeToggle?.('Compiler')}
+            onClick={() => {
+              onModeToggle?.('Compiler')
+              // Navigate to practice compiler
+              window.location.href = '/practice/compiler'
+            }}
             title={t('app.mode.compiler')}
           >
             {t('app.mode.compiler')}
@@ -163,7 +173,11 @@ const Header = ({ onThemeToggle, theme, hasUnsavedChanges, lastSaved, isOnline, 
             className={classNames('btn', 'btn--ghost', { active: mode === 'Problems' })}
             role="tab"
             aria-selected={mode === 'Problems'}
-            onClick={() => onModeToggle?.('Problems')}
+            onClick={() => {
+              onModeToggle?.('Problems')
+              // Navigate to practice problems
+              window.location.href = '/practice/problems'
+            }}
             title={t('app.mode.problems')}
           >
             {t('app.mode.problems')}

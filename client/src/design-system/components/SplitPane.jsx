@@ -28,6 +28,11 @@ export default function SplitPane({
       direction={direction}
       className={classes}
       aria-label={ariaLabel}
+      gutter={(index, direction) => {
+        const gutter = document.createElement('div')
+        gutter.className = `gutter gutter-${direction}`
+        return gutter
+      }}
     >
       {children}
     </Split>

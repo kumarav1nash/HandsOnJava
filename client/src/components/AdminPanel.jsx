@@ -11,7 +11,9 @@ import Notifications from '../admin/pages/Notifications'
 import Settings from '../admin/pages/Settings'
 import Import from '../admin/pages/Import'
 import LLMPlayground from '../admin/pages/LLMPlayground'
-import CoursesAdmin from '../admin/pages/CoursesAdmin'
+import CourseManagement from '../admin/pages/CourseManagement'
+import CourseBuilder from '../admin/components/CourseBuilder'
+import CoursePreview from '../admin/components/CoursePreview'
 
 function AdminLayoutShell() {
   const navigate = useNavigate()
@@ -83,7 +85,9 @@ export default function AdminPanel() {
           <Route index element={<Overview />} />
         <Route path="users" element={<Users />} />
         <Route path="content" element={<Content />} />
-        <Route path="courses" element={<CoursesAdmin />} />
+        <Route path="courses" element={<CourseManagement />} />
+        <Route path="courses/:courseId/builder" element={<CourseBuilder />} />
+        <Route path="courses/:courseId/preview" element={<CoursePreview />} />
         <Route path="import" element={<Import />} />
         <Route path="playground" element={<LLMPlayground />} />
         <Route path="analytics" element={<Analytics />} />

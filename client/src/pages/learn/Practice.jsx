@@ -17,6 +17,7 @@ export default function Practice({ exerciseId, onComplete }) {
   const [stderr, setStderr] = useState('')
   const [meta, setMeta] = useState(null)
   const [activeTab, setActiveTab] = useState('input')
+  const [showIO, setShowIO] = useState(true)
   const editorRef = useRef(null)
 
   const onRun = useCallback(async () => {
@@ -96,75 +97,96 @@ export default function Practice({ exerciseId, onComplete }) {
           <div className="pane__header" style={{ padding: '0.75rem', background: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
             <div className="toolbar" style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 500 }}>Code Editor</span>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                 <RunSubmitBar onRun={onRun} onSubmit={onVerify} running={running} submitting={false} />
-                <button className="btn btn--secondary" onClick={reset} title="Reset Code">Reset</button>
+                <button className="ds-btn ds-btn--secondary" onClick={reset} title="Reset Code">Reset</button>
               </div>
             </div>
           </div>
 
-          <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
-            <EditorPane ref={editorRef} value={code} onChange={setCode} language="java" theme="vs-dark" height="100%" />
-          </div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, position: 'relative' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+              {showIO ? (
+                <SplitPane direction="vertical" sizes={[75, 25]} minSize={[200, 0]} gutterSize={2} ariaLabel="Editor and IO layout">
+                  <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+                    <EditorPane ref={editorRef} value={code} onChange={setCode} language="java" theme="vs-dark" height="100%" />
+                  </div>
 
-          <div className="practice-tabs" style={{ height: '30%', minHeight: '150px', display: 'flex', flexDirection: 'column', borderTop: '1px solid var(--color-border, #2d3748)' }}>
-            <div className="tabs-header" style={{ display: 'flex', background: 'var(--color-surface, #1a1a2e)', borderBottom: '1px solid var(--color-border, #2d3748)' }}>
-              <button
-                className={`tab-btn ${activeTab === 'input' ? 'active' : ''}`}
-                onClick={() => setActiveTab('input')}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: activeTab === 'input' ? 'var(--color-background, #0f0f23)' : 'transparent',
-                  border: 'none',
-                  borderRight: '1px solid var(--color-border, #2d3748)',
-                  borderBottom: activeTab === 'input' ? '2px solid var(--color-primary, #3b82f6)' : 'none',
-                  color: activeTab === 'input' ? 'var(--color-text-primary, #f7fafc)' : 'var(--color-text-muted, #a0aec0)',
-                  cursor: 'pointer'
-                }}
-              >
-                Input
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'output' ? 'active' : ''}`}
-                onClick={() => setActiveTab('output')}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: activeTab === 'output' ? 'var(--color-background, #0f0f23)' : 'transparent',
-                  border: 'none',
-                  borderRight: '1px solid var(--color-border, #2d3748)',
-                  borderBottom: activeTab === 'output' ? '2px solid var(--color-primary, #3b82f6)' : 'none',
-                  color: activeTab === 'output' ? 'var(--color-text-primary, #f7fafc)' : 'var(--color-text-muted, #a0aec0)',
-                  cursor: 'pointer'
-                }}
-              >
-                Output {meta && (meta.exitCode === 0 ? '✓' : '✗')}
-              </button>
-            </div>
-
-            <div className="tab-content" style={{ flex: 1, overflow: 'hidden', background: 'var(--color-background, #0f0f23)' }}>
-              {activeTab === 'input' ? (
-                <div style={{ padding: '0.75rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <label className="label" htmlFor="stdin-input" style={{ marginBottom: '0.5rem', display: 'block', fontSize: '0.85rem' }}>Program Input (stdin)</label>
-                  <textarea
-                    id="stdin-input"
-                    className="input"
-                    value={stdin}
-                    onChange={(e) => setStdin(e.target.value)}
-                    placeholder="Enter input for your program"
+                  <div className="practice-tabs" style={{ display: 'flex', flexDirection: 'column' }}>
+                <div className="tabs-header" style={{ display: 'flex', background: 'var(--color-surface, #1a1a2e)', borderBottom: '1px solid var(--color-border, #2d3748)' }}>
+                  <button
+                    className={`tab-btn ${activeTab === 'input' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('input')}
                     style={{
-                      fontFamily: 'monospace',
-                      fontSize: '0.9rem',
-                      flex: 1,
-                      resize: 'none',
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-color)'
+                      padding: '0.5rem 1rem',
+                      background: activeTab === 'input' ? 'var(--color-background, #0f0f23)' : 'transparent',
+                      border: 'none',
+                      borderRight: '1px solid var(--color-border, #2d3748)',
+                      borderBottom: activeTab === 'input' ? '2px solid var(--color-primary, #3b82f6)' : 'none',
+                      color: activeTab === 'input' ? 'var(--color-text-primary, #f7fafc)' : 'var(--color-text-muted, #a0aec0)',
+                      cursor: 'pointer'
                     }}
-                  />
+                  >
+                    Input
+                  </button>
+                  <button
+                    className={`tab-btn ${activeTab === 'output' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('output')}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: activeTab === 'output' ? 'var(--color-background, #0f0f23)' : 'transparent',
+                      border: 'none',
+                      borderRight: '1px solid var(--color-border, #2d3748)',
+                      borderBottom: activeTab === 'output' ? '2px solid var(--color-primary, #3b82f6)' : 'none',
+                      color: activeTab === 'output' ? 'var(--color-text-primary, #f7fafc)' : 'var(--color-text-muted, #a0aec0)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Output {meta && (meta.exitCode === 0 ? '✓' : '✗')}
+                  </button>
                 </div>
-              ) : (
-                <OutputPane stdout={stdout} stderr={stderr} metadata={meta} isRunning={running} hasOutput={Boolean(stdout?.trim()) || Boolean(stderr?.trim())} onClear={() => { setStdout(''); setStderr(''); setMeta(null) }} />
-              )}
+
+                <div className="tab-content" style={{ flex: 1, overflow: 'hidden', background: 'var(--color-background, #0f0f23)' }}>
+                  {activeTab === 'input' ? (
+                    <div style={{ padding: '0.75rem', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                      <label className="label" htmlFor="stdin-input" style={{ marginBottom: '0.5rem', display: 'block', fontSize: '0.85rem' }}>Program Input (stdin)</label>
+                      <textarea
+                        id="stdin-input"
+                        className="input"
+                        value={stdin}
+                        onChange={(e) => setStdin(e.target.value)}
+                        placeholder="Enter input for your program"
+                        style={{
+                          fontFamily: 'monospace',
+                          fontSize: '0.9rem',
+                          flex: 1,
+                          resize: 'none',
+                          background: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-color)'
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <OutputPane stdout={stdout} stderr={stderr} metadata={meta} isRunning={running} hasOutput={Boolean(stdout?.trim()) || Boolean(stderr?.trim())} onClear={() => { setStdout(''); setStderr(''); setMeta(null) }} />
+                  )}
+                </div>
+              </div>
+            </SplitPane>
+          ) : (
+            <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+              <EditorPane ref={editorRef} value={code} onChange={setCode} language="java" theme="vs-dark" height="100%" />
             </div>
+          )}
+            </div>
+            
+            {/* Toggle button for showing/hiding IO section */}
+            <button 
+              className="ds-btn ds-btn--ghost io-toggle-btn" 
+              onClick={() => setShowIO(!showIO)} 
+              title={showIO ? "Hide Input/Output Panel" : "Show Input/Output Panel"}
+            >
+              {showIO ? '▲ Hide IO' : '▼ Show IO'}
+            </button>
           </div>
         </section>
       </SplitPane>

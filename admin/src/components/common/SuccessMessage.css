@@ -1,0 +1,79 @@
+.success-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--success-color);
+  margin-bottom: 1rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+.success-icon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.success-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.success-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.success-close {
+  flex-shrink: 0;
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.success-close:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.success-close:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Variants */
+.success-message.compact {
+  padding: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.success-message.inline {
+  display: inline-flex;
+  margin-bottom: 0;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .success-message {
+    background-color: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+}
