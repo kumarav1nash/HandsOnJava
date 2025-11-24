@@ -22,4 +22,19 @@
   "app.mode.compiler": "Compiler",
   "app.mode.problems": "Problems",
   "app.mode.admin": "Admin"
+  ,
+  "learn.title": "Learn Java",
+  "learn.subtitle": "Hands-on concepts with interactive coding",
+  "learn.steps.title": "Steps",
+  "learn.input.label": "Program Input (stdin)",
+  "learn.verify.success": "Step verified",
+  "learn.verify.fail": "Verification failed",
+  "learn.reset": "Reset",
+  "learn.search.placeholder": "Search concepts",
+  "learn.tags.aria": "Concept Tags",
+  "learn.tab.overview": "Overview",
+  "learn.tab.practice": "Practice"
+  ,
+  "learn.nav.prev": "Prev",
+  "learn.nav.next": "Next"
 }

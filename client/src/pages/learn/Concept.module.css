@@ -1,0 +1,200 @@
+/* Concept Component Styles */
+.concept {
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--ds-spacing-2xl);
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--ds-color-surface);
+}
+
+.concept__header {
+  margin-bottom: var(--ds-spacing-2xl);
+  border-bottom: 1px solid var(--ds-color-border);
+  padding-bottom: var(--ds-spacing-lg);
+}
+
+.concept__title {
+  margin: 0 0 var(--ds-spacing-sm) 0;
+  font-size: var(--ds-font-size-4xl);
+  font-weight: var(--ds-font-weight-bold);
+  color: var(--ds-color-text-primary);
+}
+
+.concept__summary {
+  font-size: var(--ds-font-size-lg);
+  line-height: var(--ds-line-height-relaxed);
+  color: var(--ds-color-text-secondary);
+  margin: 0;
+}
+
+.concept__nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--ds-spacing-lg);
+}
+
+/* Content sections */
+.concept__section {
+  margin-bottom: var(--ds-spacing-2xl);
+}
+
+.concept__section-title {
+  font-size: var(--ds-font-size-2xl);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-color-text-primary);
+  margin: 0 0 var(--ds-spacing-md) 0;
+}
+
+.concept__overview {
+  line-height: var(--ds-line-height-relaxed);
+  font-size: var(--ds-font-size-base);
+  white-space: pre-wrap;
+  color: var(--ds-color-text-primary);
+}
+
+/* Example section */
+.concept__example {
+  margin-bottom: var(--ds-spacing-2xl);
+}
+
+.concept__example-title {
+  font-size: var(--ds-font-size-xl);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-color-text-primary);
+  margin: 0 0 var(--ds-spacing-sm) 0;
+}
+
+/* Steps section */
+.concept__steps {
+  margin-top: var(--ds-spacing-3xl);
+}
+
+.concept__steps-title {
+  font-size: var(--ds-font-size-2xl);
+  font-weight: var(--ds-font-weight-semibold);
+  color: var(--ds-color-text-primary);
+  margin: 0 0 var(--ds-spacing-lg) 0;
+}
+
+.concept__step {
+  margin-bottom: var(--ds-spacing-xl);
+  padding: var(--ds-spacing-xl);
+  background-color: var(--ds-color-surface-elevated);
+  border-radius: var(--ds-border-radius-lg);
+  border: 1px solid var(--ds-color-border);
+}
+
+.concept__step:last-child {
+  margin-bottom: 0;
+}
+
+.concept__step-header {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-sm);
+  margin: 0 0 var(--ds-spacing-md) 0;
+}
+
+.concept__step-number {
+  background-color: var(--ds-color-primary);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ds-font-size-xs);
+  font-weight: var(--ds-font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.concept__step-description {
+  margin: 0;
+  font-size: var(--ds-font-size-lg);
+  font-weight: var(--ds-font-weight-medium);
+  color: var(--ds-color-text-primary);
+}
+
+.concept__step-hint {
+  background-color: var(--ds-color-info-alpha);
+  border-left: 4px solid var(--ds-color-info);
+  padding: var(--ds-spacing-md);
+  margin: var(--ds-spacing-md) 0;
+  border-radius: 0 var(--ds-border-radius-sm) var(--ds-border-radius-sm) 0;
+}
+
+.concept__step-hint strong {
+  color: var(--ds-color-info);
+}
+
+.concept__step-try {
+  margin-top: var(--ds-spacing-md);
+}
+
+.concept__step-try-label {
+  font-size: var(--ds-font-size-sm);
+  color: var(--ds-color-text-muted);
+  margin: 0 0 var(--ds-spacing-sm) 0;
+}
+
+/* Action section */
+.concept__actions {
+  margin-top: var(--ds-spacing-3xl);
+  text-align: center;
+  padding-bottom: var(--ds-spacing-2xl);
+}
+
+.concept__actions-text {
+  color: var(--ds-color-text-muted);
+  margin: 0 0 var(--ds-spacing-md) 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .concept {
+    padding: var(--ds-spacing-lg);
+  }
+  
+  .concept__title {
+    font-size: var(--ds-font-size-3xl);
+  }
+  
+  .concept__summary {
+    font-size: var(--ds-font-size-base);
+  }
+  
+  .concept__step {
+    padding: var(--ds-spacing-lg);
+  }
+  
+  .concept__nav {
+    flex-direction: column;
+    gap: var(--ds-spacing-sm);
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .concept {
+    padding: var(--ds-spacing-md);
+  }
+  
+  .concept__title {
+    font-size: var(--ds-font-size-2xl);
+  }
+  
+  .concept__step {
+    padding: var(--ds-spacing-md);
+  }
+  
+  .concept__step-header {
+    align-items: flex-start;
+  }
+  
+  .concept__step-description {
+    font-size: var(--ds-font-size-base);
+  }
+}

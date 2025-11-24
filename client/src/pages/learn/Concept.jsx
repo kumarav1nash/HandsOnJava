@@ -1,0 +1,98 @@
+import { useMemo, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useI18n } from '../../i18n/useI18n.js'
+import { findConcept, concepts } from './concepts'
+import InlineCodeRunner from './InlineCodeRunner'
+import styles from './Concept.module.css'
+
+export default function Concept({ conceptId, hideNav }) {
+  const navigate = useNavigate()
+  const concept = useMemo(() => findConcept(conceptId), [conceptId])
+  const { t } = useI18n()
+
+  useEffect(() => {
+    if (!concept) navigate('/learn')
+  }, [concept, navigate])
+
+  const currentIndex = useMemo(() => concepts.findIndex(c => c.id === conceptId), [conceptId])
+  const prevId = currentIndex > 0 ? concepts[currentIndex - 1]?.id : null
+  const nextId = currentIndex >= 0 && currentIndex + 1 < concepts.length ? concepts[currentIndex + 1]?.id : null
+
+  const goPrev = () => { if (prevId) navigate(`/learn/${prevId}`) }
+  const goNext = () => { if (nextId) navigate(`/learn/${nextId}`) }
+
+  if (!concept) return null
+
+  return (
+    <div className={styles.concept}>
+      <header className={styles.concept__header}>
+        <div className={styles.concept__nav}>
+          <h1 className={styles.concept__title}>{concept.title}</h1>
+          {!hideNav && (
+            <button 
+              className="ds-btn ds-btn--secondary" 
+              onClick={goPrev} 
+              disabled={!prevId} 
+              title={t('learn.nav.prev')}
+            >
+              ← {t('learn.nav.prev')}
+            </button>
+          )}
+        </div>
+        <p className={styles.concept__summary}>{concept.summary}</p>
+      </header>
+
+      <section className={styles['concept-content']}>
+        <div className={styles.concept__section}>
+          <h2 className={styles['concept__section-title']}>Overview</h2>
+          <p className={styles.concept__overview}>{concept.overview}</p>
+        </div>
+
+        {concept.starterCode && (
+          <div className={styles.concept__example}>
+            <h3 className={styles['concept__example-title']}>Example</h3>
+            <InlineCodeRunner initialCode={concept.starterCode} />
+          </div>
+        )}
+
+        {concept.steps && concept.steps.length > 0 && (
+          <div className={styles.concept__steps}>
+            <h2 className={styles['concept__steps-title']}>{t('learn.steps.title')}</h2>
+            {concept.steps.map((step, i) => (
+              <div key={step.id} className={`${styles.concept__step} ds-card ds-card--elevated`}>
+                <h3 className={styles['concept__step-header']}>
+                  <span className={styles['concept__step-number']}>{i + 1}</span>
+                  {step.description}
+                </h3>
+
+                {step.hint && (
+                  <div className={styles['concept__step-hint']}>
+                    <strong>Hint:</strong> {step.hint}
+                  </div>
+                )}
+
+                <div className={styles['concept__step-try']}>
+                  <p className="ds-text ds-text--muted">Try it out:</p>
+                  <InlineCodeRunner initialCode={concept.starterCode} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {!hideNav && (
+        <div className={styles.concept__actions}>
+          <p className={styles['concept__actions-text']}>Ready to test your knowledge?</p>
+          <button 
+            className="ds-btn ds-btn--primary ds-btn--lg" 
+            onClick={goNext} 
+            disabled={!nextId}
+          >
+            Next: Practice & Quiz →
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}

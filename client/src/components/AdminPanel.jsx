@@ -10,9 +10,12 @@ import Analytics from '../admin/pages/Analytics'
 import Notifications from '../admin/pages/Notifications'
 import Settings from '../admin/pages/Settings'
 import Import from '../admin/pages/Import'
+import LLMPlayground from '../admin/pages/LLMPlayground'
+import CoursesAdmin from '../admin/pages/CoursesAdmin'
 
 function AdminLayoutShell() {
   const navigate = useNavigate()
+  const [collapsed, setCollapsed] = useState(false)
 
   // Keyboard nav: g then key to go to sections (accessibility/efficiency)
   useEffect(() => {
@@ -36,10 +39,13 @@ function AdminLayoutShell() {
   }, [navigate])
 
   return (
-    <div className="admin-layout" aria-label="Admin dashboard layout">
-      <aside className="admin-sidebar" aria-label="Admin Navigation">
+    <div className={`admin-layout ${collapsed ? 'admin-layout--sidebar-collapsed' : ''}`} aria-label="Admin dashboard layout">
+      <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`} aria-label="Admin Navigation">
         <div className="admin-sidebar__header">
           <h2 className="admin-title">Admin</h2>
+          <button className="btn btn--icon sidebar-toggle" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setCollapsed(v => !v)}>
+            {collapsed ? '»' : '«'}
+          </button>
         </div>
         <nav className="admin-nav" aria-label="Primary">
           <NavLink end to="/admin" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Overview</NavLink>
@@ -47,7 +53,9 @@ function AdminLayoutShell() {
             <div className="admin-nav__section-title">Management</div>
             <NavLink to="/admin/users" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Users</NavLink>
             <NavLink to="/admin/content" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Content</NavLink>
+            <NavLink to="/admin/courses" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Courses</NavLink>
             <NavLink to="/admin/import" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>Import</NavLink>
+            <NavLink to="/admin/playground" className={({ isActive }) => `admin-nav__item ${isActive ? 'active' : ''}`}>LLM Playground</NavLink>
           </div>
           <div className="admin-nav__section" aria-label="Insights">
             <div className="admin-nav__section-title">Insights</div>
@@ -75,7 +83,9 @@ export default function AdminPanel() {
           <Route index element={<Overview />} />
         <Route path="users" element={<Users />} />
         <Route path="content" element={<Content />} />
+        <Route path="courses" element={<CoursesAdmin />} />
         <Route path="import" element={<Import />} />
+        <Route path="playground" element={<LLMPlayground />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="settings" element={<Settings />} />

@@ -4,8 +4,20 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+
+  /* CSS Variables for Theming */
+  --bg-primary: #242424;
+  --bg-secondary: #1e1e1e;
+  --text-primary: rgba(255, 255, 255, 0.87);
+  --text-muted: #999;
+  --border-color: #333;
+  --primary-color: #646cff;
+  --primary-hover: #535bf2;
+  --success-color: #4caf50;
+  --error-color: #f44336;
+
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,11 +27,12 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--primary-color);
   text-decoration: inherit;
 }
+
 a:hover {
-  color: #535bf2;
+  color: var(--primary-hover);
 }
 
 body {
@@ -44,9 +57,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
-  border-color: #646cff;
+  border-color: var(--primary-color);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -54,13 +69,41 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    /* Fallback for system preference if data-theme not set */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9f9f9;
+    --text-primary: #213547;
+    --text-muted: #666;
+    --border-color: #e0e0e0;
+    --primary-color: #646cff;
+    --primary-hover: #747bff;
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9f9f9;
+  --text-primary: #213547;
+  --text-muted: #666;
+  --border-color: #e0e0e0;
+  --primary-color: #646cff;
+  --primary-hover: #747bff;
+
+  /* Button overrides for light theme */
+  --btn-bg: #f9f9f9;
+}
+
+[data-theme="light"] button {
+  background-color: var(--bg-secondary);
+}
+
+/* Mode-specific overrides */
+[data-mode="learn"] {
+  --content-width: 800px;
+  --app-padding: 2rem;
+}
+
+[data-mode="practice"] {
+  --content-width: 100%;
+  --app-padding: 0;
 }

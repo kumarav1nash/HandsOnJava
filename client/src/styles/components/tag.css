@@ -1,0 +1,178 @@
+/* Tag Component Styles */
+.ds-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--ds-spacing-xs) var(--ds-spacing-sm);
+  font-size: var(--ds-font-size-xs);
+  font-weight: var(--ds-font-weight-medium);
+  line-height: 1;
+  border-radius: var(--ds-border-radius-full);
+  text-decoration: none;
+  transition: all var(--ds-duration-fast) var(--ds-easing-base);
+  cursor: default;
+}
+
+.ds-tag--primary {
+  background-color: var(--ds-color-primary-alpha);
+  color: var(--ds-color-primary);
+}
+
+.ds-tag--secondary {
+  background-color: var(--ds-color-secondary-alpha);
+  color: var(--ds-color-secondary);
+}
+
+.ds-tag--success {
+  background-color: var(--ds-color-success-alpha);
+  color: var(--ds-color-success);
+}
+
+.ds-tag--warning {
+  background-color: var(--ds-color-warning-alpha);
+  color: var(--ds-color-warning);
+}
+
+.ds-tag--danger {
+  background-color: var(--ds-color-danger-alpha);
+  color: var(--ds-color-danger);
+}
+
+.ds-tag--info {
+  background-color: var(--ds-color-info-alpha);
+  color: var(--ds-color-info);
+}
+
+.ds-tag--muted {
+  background-color: var(--ds-color-surface-muted);
+  color: var(--ds-color-text-muted);
+}
+
+.ds-tag--outline {
+  background-color: transparent;
+  border: 1px solid var(--ds-color-border);
+  color: var(--ds-color-text-secondary);
+}
+
+.ds-tag--outline.ds-tag--primary {
+  border-color: var(--ds-color-primary);
+  color: var(--ds-color-primary);
+}
+
+.ds-tag--outline.ds-tag--secondary {
+  border-color: var(--ds-color-secondary);
+  color: var(--ds-color-secondary);
+}
+
+.ds-tag--outline.ds-tag--success {
+  border-color: var(--ds-color-success);
+  color: var(--ds-color-success);
+}
+
+.ds-tag--outline.ds-tag--warning {
+  border-color: var(--ds-color-warning);
+  color: var(--ds-color-warning);
+}
+
+.ds-tag--outline.ds-tag--danger {
+  border-color: var(--ds-color-danger);
+  color: var(--ds-color-danger);
+}
+
+.ds-tag--outline.ds-tag--info {
+  border-color: var(--ds-color-info);
+  color: var(--ds-color-info);
+}
+
+/* Interactive tags */
+.ds-tag--interactive {
+  cursor: pointer;
+}
+
+.ds-tag--interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--ds-shadow-sm);
+}
+
+.ds-tag--interactive.ds-tag--primary:hover {
+  background-color: var(--ds-color-primary);
+  color: var(--ds-color-primary-contrast);
+}
+
+.ds-tag--interactive.ds-tag--secondary:hover {
+  background-color: var(--ds-color-secondary);
+  color: var(--ds-color-secondary-contrast);
+}
+
+.ds-tag--interactive.ds-tag--success:hover {
+  background-color: var(--ds-color-success);
+  color: var(--ds-color-success-contrast);
+}
+
+.ds-tag--interactive.ds-tag--warning:hover {
+  background-color: var(--ds-color-warning);
+  color: var(--ds-color-warning-contrast);
+}
+
+.ds-tag--interactive.ds-tag--danger:hover {
+  background-color: var(--ds-color-danger);
+  color: var(--ds-color-danger-contrast);
+}
+
+.ds-tag--interactive.ds-tag--info:hover {
+  background-color: var(--ds-color-info);
+  color: var(--ds-color-info-contrast);
+}
+
+.ds-tag--interactive.ds-tag--muted:hover {
+  background-color: var(--ds-color-surface-subtle);
+  color: var(--ds-color-text-primary);
+}
+
+.ds-tag--interactive.ds-tag--outline:hover {
+  background-color: var(--ds-color-surface-subtle);
+}
+
+/* Tag sizes */
+.ds-tag--sm {
+  padding: 2px var(--ds-spacing-xs);
+  font-size: 10px;
+}
+
+.ds-tag--lg {
+  padding: var(--ds-spacing-xs) var(--ds-spacing-md);
+  font-size: var(--ds-font-size-sm);
+}
+
+/* Tag with icon */
+.ds-tag__icon {
+  margin-right: var(--ds-spacing-xs);
+  font-size: 0.875em;
+}
+
+.ds-tag__icon--right {
+  margin-right: 0;
+  margin-left: var(--ds-spacing-xs);
+}
+
+/* Tag group */
+.ds-tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-spacing-xs);
+}
+
+/* Special tags for course levels */
+.ds-tag--beginner {
+  background-color: var(--ds-color-success-alpha);
+  color: var(--ds-color-success);
+}
+
+.ds-tag--intermediate {
+  background-color: var(--ds-color-warning-alpha);
+  color: var(--ds-color-warning);
+}
+
+.ds-tag--advanced {
+  background-color: var(--ds-color-danger-alpha);
+  color: var(--ds-color-danger);
+}

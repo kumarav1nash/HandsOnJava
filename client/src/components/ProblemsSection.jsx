@@ -85,7 +85,7 @@ const ProblemsSection = ({ onProblemNavChange }) => {
       const res = await runSolution({ problemId: selectedId, code })
       setResults(res)
       toast.dismiss(loadingToast)
-      toast[res.allPassed ? 'success' : 'error'](res.allPassed ? 'All tests passed' : 'Some tests failed')
+      // toast[res.allPassed ? 'success' : 'error'](res.allPassed ? 'All tests passed' : 'Some tests failed')
     } catch (e) {
       toast.dismiss(loadingToast)
       toast.error('Run failed')
