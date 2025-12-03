@@ -22,10 +22,12 @@ import {
 } from 'lucide-react';
 import { Editor } from '@monaco-editor/react';
 import { toast } from 'sonner';
+import { useAuthStore } from '../../stores/authStore';
 
 const ProblemCreatePage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { token } = useAuthStore();
   const [activeTab, setActiveTab] = useState('basic');
   const [previewMode, setPreviewMode] = useState(false);
   
@@ -77,7 +79,9 @@ const ProblemCreatePage = () => {
   const { data: categories = [] } = useQuery({
     queryKey: ['problem-categories'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/problem-categories');
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const response = await fetch('/api/admin/problem-categories', { headers });
       if (!response.ok) throw new Error('Failed to fetch categories');
       return response.json();
     }
@@ -86,12 +90,14 @@ const ProblemCreatePage = () => {
   // Create problem mutation
   const createProblemMutation = useMutation({
     mutationFn: async (problemData) => {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(localStorage.getItem('adminCsrfToken') ? { 'X-CSRF-Token': localStorage.getItem('adminCsrfToken') } : {})
+      };
       const response = await fetch('/api/admin/problems', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        },
+        headers,
         body: JSON.stringify(problemData)
       });
       if (!response.ok) throw new Error('Failed to create problem');

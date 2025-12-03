@@ -43,23 +43,12 @@ const AdminLayout = () => {
       icon: Code,
       description: 'Create and manage problems',
     },
+
     {
-      name: 'Analytics',
-      href: '/analytics',
-      icon: BarChart3,
-      description: 'View detailed analytics',
-    },
-    {
-      name: 'Settings',
-      href: '/settings',
-      icon: Settings,
-      description: 'System configuration',
-    },
-    {
-      name: 'Audit Log',
-      href: '/audit-log',
-      icon: Shield,
-      description: 'Security and audit logs',
+      name: 'Learn Builder',
+      href: '/learn/courses/builder',
+      icon: BookOpen,
+      description: 'Create Learn courses and modules',
     },
   ]
 
@@ -89,9 +78,8 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -118,11 +106,10 @@ const AdminLayout = () => {
                 <li key={item.name}>
                   <Link
                     to={item.href}
-                    className={`group flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      isActive(item.href)
+                    className={`group flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive(item.href)
                         ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
+                      }`}
                     onClick={() => setSidebarOpen(false)}
                   >
                     <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
@@ -177,7 +164,7 @@ const AdminLayout = () => {
               >
                 <Menu className="w-5 h-5" />
               </button>
-              
+
               {/* Search Bar */}
               <div className="ml-4 flex-1 max-w-lg">
                 <div className="relative">
@@ -226,15 +213,7 @@ const AdminLayout = () => {
                         {user?.email || 'admin@example.com'}
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setProfileDropdownOpen(false)
-                        navigate('/settings')
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Settings
-                    </button>
+
                     <button
                       onClick={() => {
                         setProfileDropdownOpen(false)

@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3005;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'your-session-secret-change-in-production';
 
@@ -72,6 +72,85 @@ let users = [
 
 let auditLogs = [];
 let sessions = new Map();
+let settings = {
+  general: {
+    siteName: 'Java Code Editor',
+    siteDescription: 'Admin portal',
+    timezone: 'UTC',
+    maintenanceMode: false
+  },
+  security: {
+    requireStrongPasswords: true,
+    enable2FA: false
+  },
+  notifications: {
+    emailEnabled: false
+  },
+  database: {
+    backupEnabled: false
+  },
+  api: {
+    rateLimit: 60
+  },
+  email: {
+    smtpServer: ''
+  }
+};
+
+// In-memory courses store
+let coursesStore = [
+  {
+    id: 'course-001',
+    title: 'Introduction to Java',
+    description: 'Learn Java programming from scratch',
+    category: 'Programming',
+    difficulty: 'BEGINNER',
+    duration: '4 weeks',
+    status: 'PUBLISHED',
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-15'),
+    studentCount: 1250,
+    rating: 4.8,
+    tags: ['Java', 'Programming', 'Beginner'],
+    instructor: 'John Doe'
+  },
+  {
+    id: 'course-002',
+    title: 'Advanced Java Concepts',
+    description: 'Deep dive into advanced Java topics',
+    category: 'Programming',
+    difficulty: 'ADVANCED',
+    duration: '6 weeks',
+    status: 'PUBLISHED',
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-02-20'),
+    studentCount: 850,
+    rating: 4.9,
+    tags: ['Java', 'Advanced', 'OOP'],
+    instructor: 'Jane Smith'
+  },
+  {
+    id: 'course-003',
+    title: 'Spring Boot Fundamentals',
+    description: 'Build REST APIs with Spring Boot',
+    category: 'Programming',
+    difficulty: 'INTERMEDIATE',
+    duration: '5 weeks',
+    status: 'DRAFT',
+    createdAt: new Date('2024-03-10'),
+    updatedAt: new Date('2024-03-22'),
+    studentCount: 420,
+    rating: 4.6,
+    tags: ['Java', 'Spring', 'Backend'],
+    instructor: 'Mike Johnson'
+  }
+];
+
+// In-memory Learn content stores
+let learnConceptsStore = {};
+let learnMcqStore = {};
+let learnPracticesStore = {};
+let learnCoursesStore = [];
 
 // Utility functions
 const generateToken = (userId) => {
@@ -309,39 +388,92 @@ app.post('/api/admin/users', authenticateToken, requireAdmin, validateRequest(se
 
 // Course management routes
 app.get('/api/admin/courses', authenticateToken, requireAdmin, (req, res) => {
-  // Mock courses data - replace with database queries
-  const courses = [
-    {
-      id: 'course-001',
-      title: 'Introduction to Java',
-      description: 'Learn Java programming from scratch',
-      category: 'Programming',
-      difficulty: 'beginner',
-      duration: '4 weeks',
-      status: 'published',
-      createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-01-15'),
-      studentCount: 1250,
-      rating: 4.8,
-      tags: ['Java', 'Programming', 'Beginner']
-    },
-    {
-      id: 'course-002',
-      title: 'Advanced Java Concepts',
-      description: 'Deep dive into advanced Java topics',
-      category: 'Programming',
-      difficulty: 'advanced',
-      duration: '6 weeks',
-      status: 'published',
-      createdAt: new Date('2024-02-01'),
-      updatedAt: new Date('2024-02-20'),
-      studentCount: 850,
-      rating: 4.9,
-      tags: ['Java', 'Advanced', 'OOP']
-    }
-  ];
-  
-  res.json({ courses });
+  res.json({ courses: coursesStore });
+});
+
+// Search with filters and pagination
+app.get('/api/admin/courses/search', authenticateToken, requireAdmin, (req, res) => {
+  let results = [...coursesStore];
+
+  const {
+    query = '',
+    status,
+    difficultyLevel,
+    tags = '',
+    category,
+    instructor,
+    startDate,
+    endDate,
+    page = 0,
+    size = 12,
+    sort = 'updatedAt,desc'
+  } = req.query;
+
+  if (query) {
+    const q = String(query).toLowerCase();
+    results = results.filter(c => c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q));
+  }
+  if (status) results = results.filter(c => c.status === status);
+  if (difficultyLevel) results = results.filter(c => c.difficulty === difficultyLevel);
+  if (category) results = results.filter(c => c.category === category);
+  if (instructor) results = results.filter(c => (c.instructor || '').toLowerCase().includes(String(instructor).toLowerCase()));
+  if (tags) {
+    const tagList = String(tags).split(',').filter(Boolean);
+    if (tagList.length) results = results.filter(c => tagList.every(t => c.tags.includes(t)));
+  }
+  if (startDate) results = results.filter(c => new Date(c.updatedAt) >= new Date(startDate));
+  if (endDate) results = results.filter(c => new Date(c.updatedAt) <= new Date(endDate));
+
+  const [sortBy, sortOrder] = String(sort).split(',');
+  results.sort((a, b) => {
+    const av = a[sortBy];
+    const bv = b[sortBy];
+    const cmp = (av > bv) - (av < bv);
+    return sortOrder === 'asc' ? cmp : -cmp;
+  });
+
+  const total = results.length;
+  const start = Number(page) * Number(size);
+  const data = results.slice(start, start + Number(size));
+
+  res.json({ data, total, page: Number(page) + 1, totalPages: Math.ceil(total / Number(size)) });
+});
+
+app.get('/api/admin/courses/:id', authenticateToken, requireAdmin, (req, res) => {
+  const course = coursesStore.find(c => c.id === req.params.id);
+  if (!course) return res.status(404).json({ error: 'Course not found' });
+  res.json({ course });
+});
+
+app.delete('/api/admin/courses/:id', authenticateToken, requireAdmin, (req, res) => {
+  const idx = coursesStore.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Course not found' });
+  const removed = coursesStore.splice(idx, 1)[0];
+  res.json({ success: true, removedId: removed.id });
+});
+
+app.post('/api/admin/courses/:id/publish', authenticateToken, requireAdmin, (req, res) => {
+  const course = coursesStore.find(c => c.id === req.params.id);
+  if (!course) return res.status(404).json({ error: 'Course not found' });
+  course.status = 'PUBLISHED';
+  course.updatedAt = new Date();
+  res.json({ success: true, course });
+});
+
+app.post('/api/admin/courses/:id/unpublish', authenticateToken, requireAdmin, (req, res) => {
+  const course = coursesStore.find(c => c.id === req.params.id);
+  if (!course) return res.status(404).json({ error: 'Course not found' });
+  course.status = 'DRAFT';
+  course.updatedAt = new Date();
+  res.json({ success: true, course });
+});
+
+app.post('/api/admin/courses/:id/archive', authenticateToken, requireAdmin, (req, res) => {
+  const course = coursesStore.find(c => c.id === req.params.id);
+  if (!course) return res.status(404).json({ error: 'Course not found' });
+  course.status = 'ARCHIVED';
+  course.updatedAt = new Date();
+  res.json({ success: true, course });
 });
 
 app.post('/api/admin/courses', authenticateToken, requireAdmin, csrfProtection, (req, res) => {
@@ -464,6 +596,23 @@ app.get('/api/admin/analytics/overview', authenticateToken, requireAdmin, (req, 
   res.json(analytics);
 });
 
+// Dashboard stats endpoint
+app.get('/api/admin/dashboard/stats', authenticateToken, requireAdmin, (req, res) => {
+  const stats = {
+    totalCourses: 12,
+    publishedCourses: 10,
+    totalProblems: 45,
+    activeUsers: 156,
+    recentActivity: [
+      { type: 'course', action: 'created', title: 'Advanced Java Concepts', user: 'John Doe', timestamp: new Date() },
+      { type: 'problem', action: 'updated', title: 'Binary Tree Traversal', user: 'Jane Smith', timestamp: new Date() },
+      { type: 'course', action: 'published', title: 'React Fundamentals', user: 'Mike Johnson', timestamp: new Date() },
+      { type: 'user', action: 'registered', title: 'New user registration', user: 'Sarah Wilson', timestamp: new Date() }
+    ]
+  };
+  res.json(stats);
+});
+
 app.get('/api/admin/analytics/courses', authenticateToken, requireAdmin, (req, res) => {
   const courseAnalytics = [
     { month: 'Jan', courses: 8, students: 450 },
@@ -515,6 +664,33 @@ app.post('/api/admin/upload', authenticateToken, requireAdmin, async (req, res) 
     url: fileUrl,
     size: content.length
   });
+});
+
+app.get('/api/admin/audit-logs/export', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { format = 'json' } = req.query;
+    const result = auditLogger.getLogs(req.query);
+    if (format === 'csv') {
+      const rows = result.logs.map(l => [l.id, l.timestamp, l.userId, l.action, l.severity, (l.details?.ip || 'unknown')]);
+      const csv = ['id,timestamp,userId,action,severity,ip'].concat(rows.map(r => r.map(v => String(v).replace(/"/g, '""')).join(','))).join('\n');
+      res.setHeader('Content-Type', 'text/csv');
+      res.send(csv);
+    } else {
+      res.json(result.logs);
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to export audit logs' });
+  }
+});
+
+app.get('/api/admin/settings', authenticateToken, requireAdmin, (req, res) => {
+  res.json(settings);
+});
+
+app.put('/api/admin/settings', authenticateToken, requireAdmin, (req, res) => {
+  const incoming = req.body;
+  settings = { ...settings, ...incoming };
+  res.json(settings);
 });
 
 // Audit logging endpoints
@@ -569,6 +745,108 @@ app.post('/api/admin/audit-export', authenticateToken, requireAdmin, async (req,
     console.error('Error exporting audit logs:', error);
     res.status(500).json({ error: 'Failed to export audit logs' });
   }
+});
+
+// Learn content admin routes
+app.get('/api/admin/learn/courses', authenticateToken, requireAdmin, (req, res) => {
+  res.json({ data: learnCoursesStore });
+});
+
+app.get('/api/admin/learn/courses/:id', authenticateToken, requireAdmin, (req, res) => {
+  const course = learnCoursesStore.find(c => c.id === req.params.id);
+  if (!course) return res.status(404).json({ error: 'Course not found' });
+  res.json({ data: course });
+});
+
+app.post('/api/admin/learn/courses', authenticateToken, requireAdmin, csrfProtection, (req, res) => {
+  const { title, summary = '', level = 'Beginner', tags = [], modules = [], status = 'DRAFT' } = req.body || {};
+  if (!title || !Array.isArray(modules)) return res.status(400).json({ error: 'Title and modules are required' });
+  const id = uuidv4();
+  const course = { id, title, summary, level, tags, modules, status, createdAt: new Date(), updatedAt: new Date() };
+  learnCoursesStore.push(course);
+  res.status(201).json({ id, data: course });
+});
+
+app.put('/api/admin/learn/courses/:id', authenticateToken, requireAdmin, csrfProtection, (req, res) => {
+  const idx = learnCoursesStore.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Course not found' });
+  const incoming = req.body || {};
+  learnCoursesStore[idx] = { ...learnCoursesStore[idx], ...incoming, updatedAt: new Date() };
+  res.json({ data: learnCoursesStore[idx] });
+});
+
+app.post('/api/admin/learn/concepts', authenticateToken, requireAdmin, csrfProtection, (req, res) => {
+  const { title, summary = '', overview = '', tags = [], difficulty = 'Beginner', starterCode = '', steps = [] } = req.body || {};
+  if (!title) return res.status(400).json({ error: 'Title is required' });
+  const id = uuidv4();
+  const concept = { id, title, summary, overview, tags, difficulty, starterCode, steps };
+  learnConceptsStore[id] = concept;
+  res.status(201).json({ id, data: concept });
+});
+
+app.get('/api/admin/learn/concepts/:id', authenticateToken, requireAdmin, (req, res) => {
+  const concept = learnConceptsStore[req.params.id];
+  if (!concept) return res.status(404).json({ error: 'Concept not found' });
+  res.json({ data: concept });
+});
+
+app.post('/api/admin/learn/mcq', authenticateToken, requireAdmin, csrfProtection, (req, res) => {
+  const { title, questions = [] } = req.body || {};
+  if (!title || !Array.isArray(questions) || questions.length === 0) return res.status(400).json({ error: 'Title and questions are required' });
+  const id = uuidv4();
+  const mcq = { id, title, questions };
+  learnMcqStore[id] = mcq;
+  res.status(201).json({ id, data: mcq });
+});
+
+app.get('/api/admin/learn/mcq/:id', authenticateToken, requireAdmin, (req, res) => {
+  const mcq = learnMcqStore[req.params.id];
+  if (!mcq) return res.status(404).json({ error: 'MCQ not found' });
+  res.json({ data: mcq });
+});
+
+app.post('/api/admin/learn/practices', authenticateToken, requireAdmin, csrfProtection, (req, res) => {
+  const { title, goal = '', starterCode = '', stdin = '', expectedStdout = '', hint = '' } = req.body || {};
+  if (!title || !goal) return res.status(400).json({ error: 'Title and goal are required' });
+  const id = uuidv4();
+  const practice = { id, title, goal, starterCode, stdin, expectedStdout, hint };
+  learnPracticesStore[id] = practice;
+  res.status(201).json({ id, data: practice });
+});
+
+app.get('/api/admin/learn/practices/:id', authenticateToken, requireAdmin, (req, res) => {
+  const practice = learnPracticesStore[req.params.id];
+  if (!practice) return res.status(404).json({ error: 'Practice not found' });
+  res.json({ data: practice });
+});
+
+// Public Learn endpoints
+app.get('/api/learn/courses', (req, res) => {
+  res.json({ data: learnCoursesStore });
+});
+
+app.get('/api/learn/courses/:id', (req, res) => {
+  const course = learnCoursesStore.find(c => c.id === req.params.id);
+  if (!course) return res.status(404).json({ error: 'Course not found' });
+  res.json({ data: course });
+});
+
+app.get('/api/learn/concepts/:id', (req, res) => {
+  const concept = learnConceptsStore[req.params.id];
+  if (!concept) return res.status(404).json({ error: 'Concept not found' });
+  res.json({ data: concept });
+});
+
+app.get('/api/learn/mcq/:id', (req, res) => {
+  const mcq = learnMcqStore[req.params.id];
+  if (!mcq) return res.status(404).json({ error: 'MCQ not found' });
+  res.json({ data: mcq });
+});
+
+app.get('/api/learn/practices/:id', (req, res) => {
+  const practice = learnPracticesStore[req.params.id];
+  if (!practice) return res.status(404).json({ error: 'Practice not found' });
+  res.json({ data: practice });
 });
 
 // Error handling middleware

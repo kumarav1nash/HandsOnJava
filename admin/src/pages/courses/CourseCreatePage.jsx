@@ -29,11 +29,13 @@ import {
 } from 'lucide-react';
 import { Editor } from '@tinymce/tinymce-react';
 import { toast } from 'sonner';
+import { useAuthStore } from '../../stores/authStore';
 
 const CourseCreatePage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const fileInputRef = useRef(null);
+  const { token } = useAuthStore();
   const [activeTab, setActiveTab] = useState('basic');
   const [previewMode, setPreviewMode] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -75,12 +77,14 @@ const CourseCreatePage = () => {
   // Create course mutation
   const createCourseMutation = useMutation({
     mutationFn: async (courseData) => {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(localStorage.getItem('adminCsrfToken') ? { 'X-CSRF-Token': localStorage.getItem('adminCsrfToken') } : {})
+      };
       const response = await fetch('/api/admin/courses', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        },
+        headers,
         body: JSON.stringify(courseData)
       });
       if (!response.ok) throw new Error('Failed to create course');
@@ -557,7 +561,7 @@ const CourseCreatePage = () => {
                   </label>
                   <div className="border border-gray-300 rounded-md">
                     <Editor
-                      apiKey="your-tinymce-api-key" // You'll need to get this from TinyMCE
+                      apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
                       value={courseData.content}
                       onEditorChange={(content) => handleInputChange('content', content)}
                       init={{

@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   base: '/admin/',
   server: {
-    port: 3001,
+    port: Number(process.env.ADMIN_WEB_PORT) || 3003,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: process.env.VITE_API_TARGET || 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       }

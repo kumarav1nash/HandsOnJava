@@ -1,13 +1,22 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from '../../i18n/useI18n.js'
 import { findConcept, concepts } from './concepts'
+import { getConcept } from '../../services/learnApi'
 import InlineCodeRunner from './InlineCodeRunner'
 import styles from './Concept.module.css'
 
 export default function Concept({ conceptId, hideNav }) {
   const navigate = useNavigate()
-  const concept = useMemo(() => findConcept(conceptId), [conceptId])
+  const useApi = import.meta.env.VITE_LEARN_USE_API === 'true'
+  const [apiConcept, setApiConcept] = useState(null)
+  useEffect(() => {
+    if (!useApi) return
+    getConcept(conceptId)
+      .then(json => setApiConcept(json?.data || null))
+      .catch(() => setApiConcept(null))
+  }, [useApi, conceptId])
+  const concept = useMemo(() => useApi ? apiConcept : findConcept(conceptId), [useApi, apiConcept, conceptId])
   const { t } = useI18n()
 
   useEffect(() => {
@@ -45,7 +54,7 @@ export default function Concept({ conceptId, hideNav }) {
       <section className={styles['concept-content']}>
         <div className={`${styles.concept__section} ds-animate-slide-in-right`}>
           <h2 className={`${styles['concept__section-title']} ds-heading--2`}>Overview</h2>
-          <p className={styles.concept__overview}>{concept.overview}</p>
+          <p className={styles.concept__overview}>{String(concept.overview || '').replace(/<[^>]+>/g, '')}</p>
         </div>
 
         {concept.starterCode && (

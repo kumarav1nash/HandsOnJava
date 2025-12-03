@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { findCourse } from './courses'
+import { getCourse } from '../../services/learnApi'
 import Concept from './Concept'
 import MCQ from './MCQ.jsx'
 import Practice from './Practice'
@@ -8,12 +9,22 @@ import { useI18n } from '../../i18n/useI18n.js'
 import styles from './Course.module.css'
 
 export default function Course({ courseId }) {
-  const course = useMemo(() => findCourse(courseId), [courseId])
+  const useApi = import.meta.env.VITE_LEARN_USE_API === 'true'
+  const [apiCourse, setApiCourse] = useState(null)
+  useEffect(() => {
+    if (!useApi) return
+    getCourse(courseId)
+      .then(json => setApiCourse(json?.data || null))
+      .catch(() => setApiCourse(null))
+  }, [useApi, courseId])
+  const course = useMemo(() => useApi ? apiCourse : findCourse(courseId), [useApi, apiCourse, courseId])
   const [index, setIndex] = useState(0)
   const navigate = useNavigate()
   const { t } = useI18n()
 
-  const modules = course?.modules || (course?.conceptIds || []).map(id => ({ type: 'concept', id }))
+  const modules = course?.modules
+    ? course.modules.map(m => ({ type: m.type, id: m.refId || m.id }))
+    : (course?.conceptIds || []).map(id => ({ type: 'concept', id }))
   const hasPrev = index > 0
   const hasNext = index + 1 < modules.length
   const module = modules[index]

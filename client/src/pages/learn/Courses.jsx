@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { courses } from './courses'
+import { courses as localCourses } from './courses'
+import { getCourses } from '../../services/learnApi'
 import { useI18n } from '../../i18n/useI18n.js'
 import styles from './Courses.module.css'
 
@@ -8,9 +9,28 @@ export default function Courses() {
   const navigate = useNavigate()
   const { t } = useI18n()
 
-  // Calculate progress for each course
+  const useApi = import.meta.env.VITE_LEARN_USE_API === 'true'
+  const [apiCourses, setApiCourses] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!useApi) return
+    setLoading(true)
+    setError('')
+    getCourses()
+      .then(json => {
+        const list = json?.data || []
+        setApiCourses(list)
+      })
+      .catch(e => setError(e.message || 'Failed to load courses'))
+      .finally(() => setLoading(false))
+  }, [useApi])
+
+  const sourceCourses = useApi ? apiCourses : localCourses
+
   const coursesWithProgress = useMemo(() => {
-    return courses.map(course => {
+    return sourceCourses.map(course => {
       const progressKey = `course_progress_${course.id}`
       try {
         const raw = localStorage.getItem(progressKey)
@@ -23,7 +43,7 @@ export default function Courses() {
       } catch { }
       return { ...course, progress: 0, started: false }
     })
-  }, [])
+  }, [sourceCourses])
 
   const openCourse = (id) => navigate(`/learn/course/${id}`)
 
@@ -35,7 +55,18 @@ export default function Courses() {
       </header>
       
       <section className="ds-section" aria-label="Courses List">
-        {coursesWithProgress.length === 0 ? (
+        {loading ? (
+          <div className={`${styles.courses__empty} empty-state`}>
+            <div className="empty-state__icon">⏳</div>
+            <h3 className={styles['courses__empty-title']}>Loading courses...</h3>
+          </div>
+        ) : error ? (
+          <div className={`${styles.courses__empty} empty-state`}>
+            <div className="empty-state__icon">⚠️</div>
+            <h3 className={styles['courses__empty-title']}>Failed to load courses</h3>
+            <p className={styles['courses__empty-description']}>{error}</p>
+          </div>
+        ) : coursesWithProgress.length === 0 ? (
           <div className={`${styles.courses__empty} empty-state ds-animate-scale-in`}>
             <div className="empty-state__icon">📚</div>
             <h3 className={styles['courses__empty-title']}>No courses available</h3>
@@ -55,18 +86,15 @@ export default function Courses() {
                 <div className={styles['course-card__header']}>
                   <h3 className={styles['course-card__title']}>{c.title}</h3>
                   <span 
-                    className={`ds-tag ds-tag--${c.level.toLowerCase()} ds-tag--sm ds-tag--interactive`}
+                    className={`ds-tag ds-tag--${(c.level || 'Beginner').toLowerCase()} ds-tag--sm ds-tag--interactive`}
                     title={c.level}
                   >
-                    {c.level}
+                    {c.level || 'Beginner'}
                   </span>
                 </div>
-                
                 <p className={styles['course-card__description']}>
                   {c.summary}
                 </p>
-                
-                {/* Progress tracker */}
                 {c.started && (
                   <div className={styles['course-card__progress']}>
                     <div className={styles['course-card__progress-header']}>
@@ -85,7 +113,6 @@ export default function Courses() {
                     </div>
                   </div>
                 )}
-                
                 <button className="ds-btn ds-btn--primary ds-btn--lg ds-btn--block ds-hover-lift">
                   {c.started ? 'Continue Learning' : 'Start Learning'}
                 </button>

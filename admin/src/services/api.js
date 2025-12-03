@@ -1,18 +1,52 @@
 // API Service for Admin Portal
-const API_BASE_URL = 'http://localhost:3002/api';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api');
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('adminToken');
+  let token = localStorage.getItem('adminToken');
+  const persisted = localStorage.getItem('admin-auth-storage');
+  if (!token && persisted) {
+    try {
+      const parsed = JSON.parse(persisted);
+      token = parsed?.state?.token || token;
+    } catch { }
+  }
+  const csrf = localStorage.getItem('adminCsrfToken');
   return {
     'Content-Type': 'application/json',
     'Authorization': token ? `Bearer ${token}` : '',
+    ...(csrf ? { 'X-CSRF-Token': csrf } : {}),
   };
+};
+
+// Ensure CSRF token exists (fetch fresh if missing)
+export const ensureCsrf = async () => {
+  let csrf = null;
+  try {
+    csrf = localStorage.getItem('adminCsrfToken');
+  } catch { }
+  if (csrf) return csrf;
+  try {
+    const res = await fetch(`${API_BASE_URL}/csrf-token`, { credentials: 'same-origin' });
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.csrfToken) {
+        try { localStorage.setItem('adminCsrfToken', data.csrfToken); } catch { }
+        return data.csrfToken;
+      }
+    }
+  } catch { }
+  return null;
 };
 
 // Helper function for API requests
 const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
+  // For mutating requests, try to ensure CSRF is present
+  const method = (options.method || 'GET').toUpperCase();
+  if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+    await ensureCsrf();
+  }
   const headers = {
     ...getAuthHeaders(),
     ...options.headers,
@@ -22,6 +56,7 @@ const apiRequest = async (endpoint, options = {}) => {
     const response = await fetch(url, {
       ...options,
       headers,
+      credentials: 'same-origin',
     });
 
     if (!response.ok) {
@@ -38,12 +73,12 @@ const apiRequest = async (endpoint, options = {}) => {
 
 export const adminApi = {
   // Authentication
-  login: (credentials) => apiRequest('/admin/login', {
+  login: (credentials) => apiRequest('/admin/auth/login', {
     method: 'POST',
     body: JSON.stringify(credentials),
   }),
 
-  logout: () => apiRequest('/admin/logout', {
+  logout: () => apiRequest('/admin/auth/logout', {
     method: 'POST',
   }),
 
@@ -92,9 +127,9 @@ export const adminApi = {
   }),
 
   // Analytics
-  getAnalytics: (dateRange = '7d') => apiRequest(`/admin/analytics?range=${dateRange}`),
+  getAnalytics: (dateRange = '7d') => apiRequest(`/admin/analytics/overview`),
 
-  getAnalyticsSummary: () => apiRequest('/admin/analytics/summary'),
+  getAnalyticsSummary: () => apiRequest('/admin/analytics/courses'),
 
   // Settings
   getSettings: () => apiRequest('/admin/settings'),
@@ -110,7 +145,7 @@ export const adminApi = {
     return apiRequest(`/admin/audit-logs?${queryString}`);
   },
 
-  getAuditSummary: (dateRange = '7d') => apiRequest(`/admin/audit-logs/summary?range=${dateRange}`),
+  getAuditSummary: (dateRange = '24h') => apiRequest(`/admin/audit-summary?timeframe=${dateRange}`),
 
   exportAuditLogs: (format, filters = {}) => {
     const queryString = new URLSearchParams({ format, ...filters }).toString();
@@ -129,6 +164,7 @@ export const adminApi = {
       method: 'POST',
       headers: {
         'Authorization': getAuthHeaders().Authorization,
+        ...(localStorage.getItem('adminCsrfToken') ? { 'X-CSRF-Token': localStorage.getItem('adminCsrfToken') } : {}),
       },
       body: formData,
     }).then(response => response.json());
@@ -156,3 +192,34 @@ export const adminApi = {
 };
 
 export default adminApi;
+
+export const adminLearnApi = {
+  listCourses: (params = {}) => {
+    const qs = new URLSearchParams(params).toString();
+    return apiRequest(`/admin/learn/courses${qs ? `?${qs}` : ''}`);
+  },
+  getCourse: (id) => apiRequest(`/admin/learn/courses/${id}`),
+  createCourse: (course) => apiRequest('/admin/learn/courses', {
+    method: 'POST',
+    body: JSON.stringify(course),
+  }),
+  updateCourse: (id, course) => apiRequest(`/admin/learn/courses/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(course),
+  }),
+  createConcept: (concept) => apiRequest('/admin/learn/concepts', {
+    method: 'POST',
+    body: JSON.stringify(concept),
+  }),
+  getConcept: (id) => apiRequest(`/admin/learn/concepts/${id}`),
+  createMcq: (mcq) => apiRequest('/admin/learn/mcq', {
+    method: 'POST',
+    body: JSON.stringify(mcq),
+  }),
+  getMcq: (id) => apiRequest(`/admin/learn/mcq/${id}`),
+  createPractice: (practice) => apiRequest('/admin/learn/practices', {
+    method: 'POST',
+    body: JSON.stringify(practice),
+  }),
+  getPractice: (id) => apiRequest(`/admin/learn/practices/${id}`),
+};

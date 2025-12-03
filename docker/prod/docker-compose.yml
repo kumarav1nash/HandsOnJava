@@ -1,0 +1,56 @@
+services:
+  # Frontend (Nginx serving Client + Admin)
+  frontend:
+    build:
+      context: ../..
+      dockerfile: docker/prod/Dockerfile.frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - code-editor-net-prod
+
+  # Backend (Spring Boot)
+  backend:
+    build:
+      context: ../../server
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/code_editor
+      DB_USER: ${DB_USER:-code_editor}
+      DB_PASSWORD: ${DB_PASSWORD:-code_editor}
+      GOOGLE_GENAI_API_KEY: ${GOOGLE_GENAI_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - code-editor-net-prod
+
+  # Database
+  postgres:
+    image: postgres:16
+    container_name: code-editor-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-code_editor}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-code_editor}
+      POSTGRES_DB: ${DB_NAME:-code_editor}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - code-editor-net-prod
+
+networks:
+  code-editor-net-prod:
+    name: code-editor-net-prod
+
+volumes:
+  postgres_data_prod:
+    driver: local

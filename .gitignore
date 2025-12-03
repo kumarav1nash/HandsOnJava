@@ -40,3 +40,13 @@ out/
 *.env
 client/.env
 client/*.env
+
+## Node ##
+node_modules    
+*node_modules
+/node_modules
+/admin/node_modules
+/admin/node_modules
+/admin/*node_modules
+/client/node_modules
+

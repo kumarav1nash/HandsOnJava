@@ -11,11 +11,13 @@ import {
   Eye,
   Edit,
   BarChart3,
-  Activity
+  Activity,
+  ChevronRight
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import LoadingSpinner from '../components/common/LoadingSpinner'
+import { useAuthStore } from '../stores/authStore'
 
 const DashboardPage = () => {
   const [quickStats, setQuickStats] = useState({
@@ -26,14 +28,15 @@ const DashboardPage = () => {
     recentActivity: []
   })
 
-  // Fetch dashboard data
+  const { token } = useAuthStore()
+
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
       const response = await fetch('/api/admin/dashboard/stats', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
+        headers,
       })
       if (!response.ok) throw new Error('Failed to fetch dashboard data')
       return response.json()

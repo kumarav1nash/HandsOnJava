@@ -30,7 +30,13 @@ export const useAuthStore = create(
           }
 
           const data = await response.json()
-          
+
+          // Persist token to localStorage for non-hook consumers
+          try {
+            localStorage.setItem('adminToken', data.token)
+            if (data.csrfToken) localStorage.setItem('adminCsrfToken', data.csrfToken)
+          } catch {}
+
           set({
             user: data.user,
             token: data.token,
@@ -63,6 +69,10 @@ export const useAuthStore = create(
         } catch (error) {
           console.error('Logout error:', error)
         } finally {
+          try {
+            localStorage.removeItem('adminToken')
+            localStorage.removeItem('adminCsrfToken')
+          } catch {}
           set({
             user: null,
             token: null,

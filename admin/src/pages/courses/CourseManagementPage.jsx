@@ -24,13 +24,17 @@ import {
   Star,
   Tag,
   Calendar,
-  User
+  User,
+  BookOpen
 } from 'lucide-react'
 import { toast } from 'sonner'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
+import { useAuthStore } from '../../stores/authStore'
+import { adminApi, ensureCsrf } from '../../services/api'
 
 const CourseManagementPage = () => {
   const queryClient = useQueryClient()
+  const { token } = useAuthStore()
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState({
     status: '',
@@ -66,10 +70,10 @@ const CourseManagementPage = () => {
         sort: `${sortBy},${sortOrder}`
       })
 
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
       const response = await fetch(`/api/admin/courses/search?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
+        headers,
       })
       if (!response.ok) throw new Error('Failed to fetch courses')
       return response.json()
@@ -78,14 +82,117 @@ const CourseManagementPage = () => {
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
 
+  const buildSampleCourses = () => {
+    return [
+      {
+        title: 'Java Fundamentals',
+        shortDescription: 'Learn core Java syntax and OOP basics',
+        description: 'A beginner-friendly course covering Java syntax, control structures, OOP, and simple projects.',
+        duration: '6 weeks',
+        difficulty: 'beginner',
+        category: 'programming',
+        tags: ['Java', 'OOP', 'Beginner'],
+        language: 'en',
+        status: 'DRAFT',
+        learningObjectives: [
+          'Write basic Java programs',
+          'Understand classes and objects',
+          'Use collections and generics'
+        ],
+        content:
+          '<h2>Welcome</h2>' +
+          '<p>This course introduces the Java language and object-oriented programming with hands-on exercises.</p>' +
+          '<h3>What You Will Learn</h3>' +
+          '<ul>' +
+            '<li>Java syntax: variables, control flow, methods</li>' +
+            '<li>Object-Oriented Programming: classes, objects, inheritance, polymorphism</li>' +
+            '<li>Collections and Generics</li>' +
+          '</ul>' +
+          '<h3>Hello World Example</h3>' +
+          '<pre><code>public class HelloWorld {\n  public static void main(String[] args) {\n    System.out.println("Hello, World!");\n  }\n}</code></pre>'
+      },
+      {
+        title: 'Data Structures in Java',
+        shortDescription: 'Master essential data structures',
+        description: 'Covers arrays, lists, stacks, queues, maps and trees with Java implementations.',
+        duration: '8 weeks',
+        difficulty: 'intermediate',
+        category: 'data-structures',
+        tags: ['Java', 'Data Structures'],
+        language: 'en',
+        status: 'DRAFT',
+        learningObjectives: [
+          'Implement common data structures',
+          'Analyze time/space complexity',
+          'Apply data structures to problems'
+        ],
+        content:
+          '<h2>Course Overview</h2>' +
+          '<p>We will implement and analyze core data structures in Java.</p>' +
+          '<h3>Topics</h3>' +
+          '<ol>' +
+            '<li>Arrays and Linked Lists</li>' +
+            '<li>Stacks and Queues</li>' +
+            '<li>HashMaps and TreeMaps</li>' +
+            '<li>Trees and Traversals</li>' +
+          '</ol>' +
+          '<h3>Collections Example</h3>' +
+          '<pre><code>import java.util.*;\n\nList<String> list = new ArrayList<>();\nlist.add("A"); list.add("B");\nMap<String, Integer> map = new HashMap<>();\nmap.put("A", 1); map.put("B", 2);</code></pre>'
+      },
+      {
+        title: 'Algorithms with Java',
+        shortDescription: 'Solve problems using algorithms',
+        description: 'Sorting, searching, recursion, dynamic programming and graph algorithms in Java.',
+        duration: '10 weeks',
+        difficulty: 'advanced',
+        category: 'algorithms',
+        tags: ['Java', 'Algorithms'],
+        language: 'en',
+        status: 'DRAFT',
+        learningObjectives: [
+          'Apply sorting and searching',
+          'Design dynamic programming solutions',
+          'Work with graph algorithms'
+        ],
+        content:
+          '<h2>Algorithmic Thinking</h2>' +
+          '<p>We focus on designing efficient solutions and analyzing complexity.</p>' +
+          '<h3>QuickSort (Java)</h3>' +
+          '<pre><code>void quickSort(int[] a, int l, int r){\n  if(l >= r) return;\n  int p = partition(a, l, r);\n  quickSort(a, l, p - 1);\n  quickSort(a, p + 1, r);\n}</code></pre>' +
+          '<h3>Complexity</h3>' +
+          '<p>We compare time and space trade-offs across approaches.</p>'
+      }
+    ]
+  }
+
+  const seedCoursesMutation = useMutation({
+    mutationFn: async () => {
+      const samples = buildSampleCourses()
+      const existingTitles = new Set((courses || []).map(c => c.title))
+      await ensureCsrf()
+      for (const course of samples) {
+        if (existingTitles.has(course.title)) continue
+        await adminApi.createCourse(course)
+      }
+      return true
+    },
+    onSuccess: () => {
+      toast.success('Sample courses created')
+      queryClient.invalidateQueries(['courses'])
+    },
+    onError: () => {
+      toast.error('Failed to create sample courses')
+    }
+  })
+
   // Delete course mutation
   const deleteCourseMutation = useMutation({
     mutationFn: async (courseId) => {
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
       const response = await fetch(`/api/admin/courses/${courseId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
+        headers,
       })
       if (!response.ok) throw new Error('Failed to delete course')
       return response.json()
@@ -102,11 +209,11 @@ const CourseManagementPage = () => {
   // Publish course mutation
   const publishCourseMutation = useMutation({
     mutationFn: async (courseId) => {
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
       const response = await fetch(`/api/admin/courses/${courseId}/publish`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
+        headers,
       })
       if (!response.ok) throw new Error('Failed to publish course')
       return response.json()
@@ -123,11 +230,11 @@ const CourseManagementPage = () => {
   // Unpublish course mutation
   const unpublishCourseMutation = useMutation({
     mutationFn: async (courseId) => {
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
       const response = await fetch(`/api/admin/courses/${courseId}/unpublish`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
+        headers,
       })
       if (!response.ok) throw new Error('Failed to unpublish course')
       return response.json()
@@ -144,11 +251,11 @@ const CourseManagementPage = () => {
   // Archive course mutation
   const archiveCourseMutation = useMutation({
     mutationFn: async (courseId) => {
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
       const response = await fetch(`/api/admin/courses/${courseId}/archive`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
+        headers,
       })
       if (!response.ok) throw new Error('Failed to archive course')
       return response.json()
@@ -269,6 +376,21 @@ const CourseManagementPage = () => {
             <Plus className="w-4 h-4" />
             Create Course
           </Link>
+          <Link
+            to="/learn/courses/builder"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-2"
+          >
+            <BookOpen className="w-4 h-4" />
+            Create Learn Course
+          </Link>
+          <button
+            onClick={() => seedCoursesMutation.mutate()}
+            disabled={seedCoursesMutation.isPending}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50"
+          >
+            <Plus className="w-4 h-4" />
+            {seedCoursesMutation.isPending ? 'Adding Samples...' : 'Add Sample Courses'}
+          </button>
         </div>
       </div>
 

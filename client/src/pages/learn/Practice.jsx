@@ -6,10 +6,19 @@ import RunSubmitBar from '../../components/RunSubmitBar'
 import { runJava } from '../../services/compilerClient'
 import usePersistentProblemCode from '../../utils/usePersistentProblemCode'
 import { getPractice } from './practices'
+import { getPracticeData } from '../../services/learnApi'
 import SplitPane from '../../design-system/components/SplitPane'
 
 export default function Practice({ exerciseId, onComplete }) {
-  const exercise = useMemo(() => getPractice(exerciseId), [exerciseId])
+  const useApi = import.meta.env.VITE_LEARN_USE_API === 'true'
+  const [apiExercise, setApiExercise] = useState(null)
+  useEffect(() => {
+    if (!useApi) return
+    getPracticeData(exerciseId)
+      .then(json => setApiExercise(json?.data || null))
+      .catch(() => setApiExercise(null))
+  }, [useApi, exerciseId])
+  const exercise = useMemo(() => useApi ? apiExercise : getPractice(exerciseId), [useApi, apiExercise, exerciseId])
   const [code, setCode] = usePersistentProblemCode(exerciseId, exercise?.starterCode || '', 'learn_exercise')
   const [stdin, setStdin] = useState(exercise?.stdin || '')
   const [running, setRunning] = useState(false)

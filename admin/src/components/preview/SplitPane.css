@@ -1,0 +1,12 @@
+.gutter {
+    position: relative;
+    z-index: 10;
+}
+
+.gutter-horizontal {
+    cursor: col-resize;
+}
+
+.gutter-vertical {
+    cursor: row-resize;
+}

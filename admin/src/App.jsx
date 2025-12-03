@@ -7,14 +7,14 @@ import DashboardPage from './pages/DashboardPage'
 import CourseManagementPage from './pages/courses/CourseManagementPage'
 import CourseCreatePage from './pages/courses/CourseCreatePage'
 import CourseEditPage from './pages/courses/CourseEditPage'
+import CoursePreviewPage from './pages/courses/CoursePreviewPage'
 import ProblemManagementPage from './pages/problems/ProblemManagementPage'
 import ProblemCreatePage from './pages/problems/ProblemCreatePage'
 import ProblemEditPage from './pages/problems/ProblemEditPage'
-import AnalyticsPage from './pages/analytics/AnalyticsPage'
-import SettingsPage from './pages/settings/SettingsPage'
-import AuditLogPage from './pages/audit/AuditLogPage'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import './App.css'
+import CourseBuilderPage from './pages/learn/CourseBuilderPage'
+import LearnCoursePreviewPage from './pages/learn/LearnCoursePreviewPage'
 
 function App() {
   const { isAuthenticated } = useAuthStore()
@@ -23,14 +23,14 @@ function App() {
     <div className="App">
       <Routes>
         {/* Public Routes */}
-        <Route 
-          path="/login" 
-          element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" replace />} 
+        <Route
+          path="/login"
+          element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" replace />}
         />
-        
+
         {/* Protected Routes */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             <ProtectedRoute>
               <AdminLayout />
@@ -39,28 +39,31 @@ function App() {
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
-          
+
           {/* Course Management Routes */}
           <Route path="courses">
             <Route index element={<CourseManagementPage />} />
             <Route path="create" element={<CourseCreatePage />} />
             <Route path="edit/:id" element={<CourseEditPage />} />
-            <Route path="preview/:id" element={<div>Course Preview</div>} />
+            <Route path="preview/:id" element={<CoursePreviewPage />} />
           </Route>
-          
+
+          {/* Learn Content Builder */}
+          <Route path="learn">
+            <Route path="courses/builder" element={<CourseBuilderPage />} />
+            <Route path="courses/preview/:id" element={<LearnCoursePreviewPage />} />
+          </Route>
+
           {/* Problem Management Routes */}
           <Route path="problems">
             <Route index element={<ProblemManagementPage />} />
             <Route path="create" element={<ProblemCreatePage />} />
             <Route path="edit/:id" element={<ProblemEditPage />} />
           </Route>
-          
-          {/* Analytics and Settings */}
-          <Route path="analytics" element={<AnalyticsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="audit-log" element={<AuditLogPage />} />
+
+
         </Route>
-        
+
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

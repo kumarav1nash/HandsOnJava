@@ -1,8 +1,17 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { getMcq } from './mcqData'
+import { getMcq as getMcqApi } from '../../services/learnApi'
 
 export default function MCQ({ mcqId, onComplete }) {
-  const mcq = useMemo(() => getMcq(mcqId), [mcqId])
+  const useApi = import.meta.env.VITE_LEARN_USE_API === 'true'
+  const [apiMcq, setApiMcq] = useState(null)
+  useEffect(() => {
+    if (!useApi) return
+    getMcqApi(mcqId)
+      .then(json => setApiMcq(json?.data || null))
+      .catch(() => setApiMcq(null))
+  }, [useApi, mcqId])
+  const mcq = useMemo(() => useApi ? apiMcq : getMcq(mcqId), [useApi, apiMcq, mcqId])
   const [answers, setAnswers] = useState({})
   const [checked, setChecked] = useState(false)
 
